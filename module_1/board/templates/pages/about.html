@@ -1,9 +1,14 @@
 {% extends 'base.html' %}
 
 {% block header %}
+  <h1>Danielle Chan</h1>
   <h2>{% block title %}About{% endblock title %}</h2>
 {% endblock header %}
 
 {% block content %}
-  <p>Danielle Chan is a Data Scientist at Booz Allen Hamilton supporting the United States Department of Defense. She specializes in statistical modeling and mathematical modeling. She earned a Bachelor of Science in Applied Mathematical Sciences.</p>
+<main class="about">
+    <img src="{{ url_for('static', filename='ProfilePicture.jpg') }}" class="profile-pic" alt="Profile Picture">
+    <p>Danielle Chan is a Data Scientist at Booz Allen Hamilton supporting the United States Department of Defense. She specializes in statistical modeling and mathematical modeling. She will be in the Data Science Master's program at Johns Hopkins University. She earned a Bachelor of Science in Applied Mathematical Sciences from Bucknell University.</p>
+<main
 {% endblock content %}
+

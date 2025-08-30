@@ -6,7 +6,7 @@ body {
   font-family: sans-serif;
   font-size: 20px;
   margin: 0 auto;
-  text-align: center;
+  color: #333;
 }
 
 a,
@@ -18,17 +18,66 @@ a:hover {
   color: #0056b3;
 }
 
-nav ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-nav ul li {
-  display: inline;
-  margin: 0 5px;
-}
-
 main {
   width: 80%;
   margin: 0 auto;
+  text-align: left;
+}
+
+main p {
+  line-height: 1.6;    /* better readability */
+  max-width: 700px;    /* keep paragraphs from stretching too wide */
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+    margin: 20px 0;
+}
+
+header h2{
+  text-align: center;
+  padding: 20px 40px;
+}
+
+nav {
+  display: flex;
+  justify-content: flex-end; /* pushes everything inside nav to the right */
+  background-color: #9ACD32; /* bar color */
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-left: 20px;
+}
+
+nav a,
+nav a:visited {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius:4px;
+    transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+  background-color: rgba(0, 0, 0, 0.2); /* subtle dark overlay */
+  color: white;
+}
+
+.about .profile-pic {
+  float: right;
+  width: 300px;
+  height: 300px;
+  margin-left: 20px;
+  border-radius: 50%; /* makes it circular */
 }
