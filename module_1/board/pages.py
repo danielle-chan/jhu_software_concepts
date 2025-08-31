@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
 
+#Create a blueprint named "pages"
 bp = Blueprint("pages", __name__)
 
 # About page

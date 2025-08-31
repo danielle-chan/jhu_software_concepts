@@ -7,6 +7,7 @@ body {
   font-size: 20px;
   margin: 0 auto;
   color: #333;
+  background-color: #ECF8F2;
 }
 
 a,
@@ -21,7 +22,7 @@ a:hover {
 main {
   width: 80%;
   margin: 0 auto;
-  text-align: left;
+  padding: 20px 40px;
 }
 
 main p {
@@ -43,7 +44,7 @@ header h2{
 nav {
   display: flex;
   justify-content: flex-end; /* pushes everything inside nav to the right */
-  background-color: #9ACD32; /* bar color */
+  background-color: #45BA79; /* bar color */
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -80,4 +81,17 @@ nav a:hover {
   height: 300px;
   margin-left: 20px;
   border-radius: 50%; /* makes it circular */
+}
+
+.about p {
+  max-width: 700px;
+}
+
+/* remove the width restriction only for publications */
+.publications p {
+  max-width: none;
+}
+
+section {
+  margin: 60px 0;
 }
