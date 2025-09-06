@@ -15,15 +15,23 @@ def scrape_data(pages=1500):
         html = html_bytes.decode("utf-8")
         soup = BeautifulSoup(html, 'html.parser')
 
-        # Program name
+        # Program name and Degree type
         program_html = soup.find_all("td", class_="tw-px-3 tw-py-5 tw-text-sm tw-text-gray-500")
         programs =[]
+        degree_types = []
+
         for td in program_html:
             div = td.find("div", class_="tw-text-gray-900")
             if div:
-                first_span = div.find("span")
-                if first_span:  # only grab the first <span>
-                    programs.append(first_span.get_text(strip=True))
+                spans = div.find_all("span")
+                if len(spans) > 0:
+                    programs.append(spans[0].get_text(strip=True))  # first span = program
+                else:
+                    programs.append("N/A")
+                if len(spans) > 1:
+                    degree_types.append(spans[1].get_text(strip=True))  # second span = degree type
+                else:
+                    degree_types.append("N/A")
 
         # University
         university_html = soup.find_all('div',class_="tw-font-medium tw-text-gray-900 tw-text-sm")
@@ -55,23 +63,50 @@ def scrape_data(pages=1500):
                 statuses.append(text)
         
         # Applicant URLs
-        urls = re.findall(r'https://www\.thegradcafe\.com/result/\d+\S*', html)
+        applicant_urls = re.findall(r'https://www\.thegradcafe\.com/result/\d+\S*', html)
+
+        # GRE, GPA, Semester, International
+        gre_g_scores, gre_v_scores, gre_aw_scores, gpas, semesters, intl_flags = [], [], [], [], [], []
+        extra_html = soup.find_all("div", class_=re.compile(r"tw-inline-flex"))
+
+        for tag in extra_html:
+            text = tag.get_text(strip=True)
+
+            if text.startswith("GRE V"):
+                gre_v_scores.append(text.replace("GRE V", "").strip())
+            elif text.startswith("GRE AW"):
+                gre_aw_scores.append(text.replace("GRE AW", "").strip())
+            elif text.startswith("GRE "):
+                gre_g_scores.append(text.replace("GRE", "").strip())
+            elif text.startswith("GPA"):
+                gpas.append(text.replace("GPA", "").strip())
+            elif "Spring" in text or "Fall" in text or "Summer" in text:
+                semesters.append(text.strip())
+            elif text in ["International", "American"]:
+                intl_flags.append(text)
 
         # stitch them together by index
-        for i in range(min(len(universities), len(programs), len(comments), len(dates_added), len(statuses), len(urls))):
+        for i in range(len(universities)):
             all_data.append({
                 "university": universities[i],
                 "program": programs[i],
+                "degree type": degree_types[i],
                 "comment": comments[i],
                 "date_added": dates_added[i],
-                "status": statuses[i],
-                "url": urls[i]
+                "applicant_status": statuses[i],
+                "url": applicant_urls[i],
+                "gpa": gpas[i] if i < len(gpas) else "N/A",
+                "gre_general": gre_g_scores[i] if i < len(gre_g_scores) else "N/A",
+                "gre_verbal": gre_v_scores[i] if i < len(gre_v_scores) else "N/A",
+                "gre_aw": gre_aw_scores[i] if i < len(gre_aw_scores) else "N/A",
+                "semester_start": semesters[i] if i < len(semesters) else "N/A",
+                "international_status": intl_flags[i] if i < len(intl_flags) else "N/A",
             })
     return all_data
 
 data = scrape_data(pages=1)
 print(len(data), "entries")
-print(data[:2])
+print(data[:1])
 
 
 
@@ -138,19 +173,13 @@ print(data[:2])
 #applicant_urls = re.findall(r'https://www\.thegradcafe\.com/result/\d+\S*', html)
 #print(applicant_urls)
 
-# Semester and Year of Program Start
-
-# GRE Score
-
-# GRE V Score
-
-# Masters or PhD
-
-# GPA
-
-# GRE AW
-
 # use to search HTML
+#url = "https://www.thegradcafe.com/survey/?page="
+
+#page = urlopen(url)
+#html_bytes = page.read()
+#html = html_bytes.decode("utf-8")
+
 #search_term = "North Dakota"
 #if search_term in html:
 #    print(f'"{search_term}" found in HTML!')
