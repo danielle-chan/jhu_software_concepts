@@ -104,7 +104,3 @@ def scrape_data(pages=1500):
             })
     return all_data
 
-data = scrape_data(pages=1)
-print(len(data), "entries")
-print(data[:1])
-
