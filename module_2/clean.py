@@ -1,5 +1,5 @@
 import json
-from scrape import scrape_data  # assuming scrape_data is in scrape.py
+from scrape import scrape_data
 import re
 
 def clean_data(raw_data):
@@ -50,4 +50,7 @@ def clean_data(raw_data):
         cleaned.append(cleaned_entry)
 
     return cleaned
+
+def save_data(cleaned_data, filename="applicant_data.json"):
+    # figure out which JSON function to use to save data into a json file
 
