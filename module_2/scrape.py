@@ -7,15 +7,19 @@ def scrape_data(pages=1500):
     all_data = []
 
     for page_num in range(1, pages + 1):
-        url = f"https://www.thegradcafe.com/survey/?page={page_num}"
-        print(f"Scraping page {page_num}: {url}")
 
+        # Collect applicant data from each page
+        url = f"https://www.thegradcafe.com/survey/?page={page_num}"
+
+        # Open web page
         page = urlopen(url)
+
+        # Extract the HTML from the page
         html_bytes = page.read()
         html = html_bytes.decode("utf-8")
         soup = BeautifulSoup(html, 'html.parser')
 
-        # Program name and Degree type
+        # Find program name and degree type
         program_html = soup.find_all("td", class_="tw-px-3 tw-py-5 tw-text-sm tw-text-gray-500")
         programs =[]
         degree_types = []
@@ -33,11 +37,11 @@ def scrape_data(pages=1500):
                 else:
                     degree_types.append("N/A")
 
-        # University
+        # Find university
         university_html = soup.find_all('div',class_="tw-font-medium tw-text-gray-900 tw-text-sm")
         universities = [i.get_text(strip=True) for i in university_html]
 
-        # Comments
+        # Find comments
         rows = soup.find_all("tr")
         comments = []
         for row in rows:
@@ -47,7 +51,7 @@ def scrape_data(pages=1500):
             else:
                 comments.append("N/A")
 
-        # Date added and Applicant Status
+        # Find date added and applicant Status
         date_html = soup.find_all('td',class_="tw-px-3 tw-py-5 tw-text-sm tw-text-gray-500 tw-whitespace-nowrap tw-hidden md:tw-table-cell")
         dates_added = []
         statuses = []
@@ -62,10 +66,10 @@ def scrape_data(pages=1500):
                 text = td.get_text(strip=True)
                 statuses.append(text)
         
-        # Applicant URLs
+        # Find applicant URLs
         applicant_urls = re.findall(r'https://www\.thegradcafe\.com/result/\d+\S*', html)
 
-        # GRE, GPA, Semester, International
+        # Find GRE, GPA, semester, international/US
         gre_g_scores, gre_v_scores, gre_aw_scores, gpas, semesters, intl_flags = [], [], [], [], [], []
         extra_html = soup.find_all("div", class_=re.compile(r"tw-inline-flex"))
 
@@ -103,4 +107,3 @@ def scrape_data(pages=1500):
                 "international_status": intl_flags[i] if i < len(intl_flags) else "N/A",
             })
     return all_data
-
