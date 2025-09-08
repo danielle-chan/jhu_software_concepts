@@ -11,7 +11,7 @@ degree program + university names. It appends two new fields to each row:
 2. Upload these files (or import the zip).
 3. Install deps:
    ```bash
-   pip install -r requirements.txt
+   python3 -m pip install -r requirements.txt
    ```
 4. Run the API server:
    ```bash
