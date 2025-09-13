@@ -1,0 +1,8 @@
+# Install PostgreSQL
+brew install postgresql
+
+# Start PostgreSQL service
+brew services start postgresql
+
+# Install psycopg with binary dependencies
+pip3 install "psycopg[binary]"
