@@ -37,7 +37,7 @@ international = cur.fetchone()[0]
 # Compute percentage
 if total > 0:
     percentage = (international / total) * 100
-    print(f"International applicants: {percentage:.2f}% ({international} out of {total})")
+    print(f"Percentage of international applicants: {percentage:.2f}% ({international} out of {total})")
 else:
     print("No applicants in the database.")
 

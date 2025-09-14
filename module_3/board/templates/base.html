@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %}- Grad School Cafe Data Analysis</title>
+  <style>
+    nav a {
+      color: #607d8b;
+      font-size: 3cm;
+      margin-left: 50px;
+      text-decoration: none;
+    }
+
+    .course {
+      padding: 20x;
+      margin: 10px;
+      background-color: #f7f4f4;
+    }
+
+    .review {
+      margin-left: 50px;
+      font-size:20px;
+    }
+
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="{{url_for{'index'} }}"> Grad School Cafe Data Analysis</a>
+  </nav>
+  <hr>
+  <div class="content">
+    {% block content %} {% endblock %}
+  </div>
+</body>
+</html>

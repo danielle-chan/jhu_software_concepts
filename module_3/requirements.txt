@@ -6,3 +6,5 @@ brew services start postgresql
 
 # Install psycopg with binary dependencies
 pip3 install "psycopg[binary]"
+
+Flask>=2.0
