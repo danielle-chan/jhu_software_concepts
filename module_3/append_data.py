@@ -2,7 +2,7 @@ import psycopg
 import json
 
 def append_data(filename="llm_hosting/full_out.jsonl"):
-    """Append new applicants into the database, skipping duplicates by URL."""
+    """Append new applicants into the database, skipping duplicates by URL"""
 
     conn = psycopg.connect(
         dbname="applicants",

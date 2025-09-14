@@ -1,14 +1,5 @@
-# Install PostgreSQL
-brew install postgresql
-
-# Start PostgreSQL service
-brew services start postgresql
-
-# Install psycopg with binary dependencies
-pip3 install "psycopg[binary]"
-
 Flask>=2.0
 python >= 3.10
 beautifulsoup4>=4.12.0
 urllib
-
+postgresql
