@@ -12,7 +12,7 @@
     }
 
     .course {
-      padding: 20x;
+      padding: 20px;
       margin: 10px;
       background-color: #f7f4f4;
     }
@@ -26,11 +26,11 @@
 </head>
 <body>
   <nav>
-    <a href="{{url_for{'index'} }}"> Grad School Cafe Data Analysis</a>
+    <a href="{{ url_for('index') }}"> Grad School Cafe Data Analysis</a>
   </nav>
   <hr>
   <div class="content">
-    {% block content %} {% endblock %}
+    {% block content %}{% endblock %}
   </div>
 </body>
 </html>

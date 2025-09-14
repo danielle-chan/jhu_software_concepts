@@ -22,24 +22,13 @@ print("Number of Fall 2025 applicants:", count)
 
 
 # What percentage of entries are from international students (not American or Other) (to two decimal places)?
-# Count all applicants
-cur.execute("SELECT COUNT(*) FROM applicants")
-total = cur.fetchone()[0]
-
 # Count international applicants (not 'American' or 'Other')
 cur.execute("""
-    SELECT COUNT(*) 
-    FROM applicants
-    WHERE us_or_international ILIKE 'International'
+     SELECT ROUND(100.0 * SUM(CASE WHEN us_or_international ILIKE '%International%' THEN 1 ELSE 0 END) / COUNT(*), 2)
+    FROM applicants;
 """)
-international = cur.fetchone()[0]
-
-# Compute percentage
-if total > 0:
-    percentage = (international / total) * 100
-    print(f"Percentage of international applicants: {percentage:.2f}% ({international} out of {total})")
-else:
-    print("No applicants in the database.")
+percent_international = cur.fetchone()[0]
+print(f"Percentage of international applicants: {percent_international:.2f}%" if percent_international else "No applicants in the database.")
 
 
 # What is the average GPA, GRE, GRE V, GRE AW of applicants who provide these metrics?
@@ -105,9 +94,8 @@ cur.execute("""
       AND gpa IS NOT NULL;
 """)
 
-
-result = cur.fetchone()
-print(f"Average GPA of accepted applicants for Fall 2025: {result[0]:.2f}" if result[0] else "No data available")
+avg_gpa_accepted = cur.fetchone()
+print(f"Average GPA of accepted applicants for Fall 2025: {avg_gpa_accepted[0]:.2f}" if avg_gpa_accepted[0] else "No data available")
 
 
 # How many entries are from applicants who applied to JHU for a masters degree in Computer Science?
@@ -131,8 +119,8 @@ cur.execute("""
     );
 """)
 
-result = cur.fetchone()
-print(f"Number of applicants to JHU for a Master's in Computer Science: {result[0]}")
+jhu_apps = cur.fetchone()
+print(f"Number of applicants to JHU for a Master's in Computer Science: {jhu_apps[0]}")
 
 
 # How many entries from 2025 are acceptances from applicants who applied to Georgetown University for a PhD in Computer Science?
@@ -156,8 +144,8 @@ cur.execute("""
         );
 """)
 
-result = cur.fetchone()
-print(f"Number of 2025 Georgetown PhD Computer Science acceptances: {result[0]}")
+gtown_apps = cur.fetchone()
+print(f"Number of 2025 Georgetown PhD Computer Science acceptances: {gtown_apps[0]}")
 
 
 # How many students applied for Fall 2025 to a Data Science program?
@@ -172,8 +160,8 @@ cur.execute("""
         );
 """)
 
-result = cur.fetchone()
-print(f"Number of Fall 2025 Data Science applicants: {result[0]}")
+ds_apps = cur.fetchone()
+print(f"Number of Fall 2025 Data Science applicants: {ds_apps[0]}")
 
 
 # How many students submitted a GRE score?
@@ -186,8 +174,8 @@ cur.execute("""
        OR gre_aw IS NOT NULL;
 """)
 
-result = cur.fetchone()
-print(f"Number of applicants who submitted a GRE score: {result[0]}")
+count_gre = cur.fetchone()
+print(f"Number of applicants who submitted a GRE score: {count_gre[0]}")
 
 cur.close()
 conn.close()
