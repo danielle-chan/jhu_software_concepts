@@ -13,7 +13,7 @@ cur = conn.cursor()
 # Clear out old data before inserting fresh rows
 cur.execute("TRUNCATE TABLE applicants;")
 
-with open("full_out.jsonl", "r") as f:
+with open("llm_hosting/full_out.jsonl", "r") as f:
     for line in f:
         entry = json.loads(line)
 

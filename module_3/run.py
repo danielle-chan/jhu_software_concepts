@@ -1,5 +1,8 @@
 import psycopg
-from flask import Flask, render_template
+import subprocess
+from flask import Flask, render_template, redirect, url_for
+
+from append_data import append_data
 
 # Create the Flask application using the factory function defined within __init__.py
 app = Flask(__name__)
@@ -151,6 +154,7 @@ def index():
 
     cur.close()
     conn.close()
+
     return render_template(
         'index.html',
         count=count,
@@ -167,6 +171,29 @@ def index():
         ds_apps=ds_apps,
         count_GRE=count_GRE
     )
+
+@app.route('/pull_data')
+def pull_data():
+    """Scrape, clean, standardize , append new data"""
+    # 1. Scrape raw data
+    subprocess.run(["python3", "scrape.py"], check=True)
+
+    # 2. Clean data
+    subprocess.run(["python3", "clean.py"], check=True)
+
+    # 3. Standardize data (LLM CLI)
+    subprocess.run([
+        "python3", "llm_hosting/app.py",
+        "--file", "cleaned_applicant_data.json",
+        "--out", "llm_hosting/full_out.jsonl"
+    ], check=True)
+
+    # 4. Append to database
+    append_data("llm_hosting/full_out.jsonl")
+
+    # Redirect back to dashboard after completion
+    return redirect(url_for("index"))
+
 
 if __name__ == "__main__":
     # Start the Flask development server
