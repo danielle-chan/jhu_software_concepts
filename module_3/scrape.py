@@ -56,12 +56,12 @@ def scrape_data(pages=1500):
         dates_added = []
         statuses = []
         for td in date_html:
-            # only keep if it has no <div> inside
+            # Only keep if it has no <div> inside
             if not td.find("div"):
                 text = td.get_text(strip=True)
                 if text:  # skip empty ones
                     dates_added.append(text)
-            # if it has <div> inside, it's applicant status
+            # If it has <div> inside, it's applicant status
             else:
                 text = td.get_text(strip=True)
                 statuses.append(text)
@@ -89,7 +89,7 @@ def scrape_data(pages=1500):
             elif text in ["International", "American"]:
                 intl_flags.append(text)
 
-        # stitch them together by index
+        # Stitch them together by index
         for i in range(len(universities)):
             all_data.append({
                 "university": universities[i],

@@ -1,11 +1,14 @@
 import psycopg
 import subprocess
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash
 
 from append_data import append_data
 
+is_running = False
+
 # Create the Flask application using the factory function defined within __init__.py
 app = Flask(__name__)
+app.secret_key = "secret_key" # Need a secret key to use flash
 
 def get_db_connection():
     """A function to connect to the database"""
@@ -172,6 +175,7 @@ def index():
         count_GRE=count_GRE
     )
 
+
 @app.route('/pull_data')
 def pull_data():
     """Scrape, clean, standardize , append new data"""
@@ -192,6 +196,18 @@ def pull_data():
     append_data("llm_hosting/full_out.jsonl")
 
     # Redirect back to dashboard after completion
+    return redirect(url_for("index"))
+
+
+@app.route("/update_analysis")
+def update_analysis():
+    global is_running
+    if is_running:
+        flash("Please wait. Cannot update analysis while a data pull is running.")
+        return redirect(url_for("index"))
+
+    # Just reloading the analysis
+    flash("Analysis updated with the latest data.")
     return redirect(url_for("index"))
 
 
