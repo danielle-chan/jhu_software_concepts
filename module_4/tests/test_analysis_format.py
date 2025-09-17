@@ -21,7 +21,7 @@ def test_answer_labels_present(example_client):
 
     # Look for "Answer:" at least once
     assert "Answer:" in html, "Expected 'Answer:' label not found in page"
-
+    
 
 def test_percentage_formatting(example_client):
     """Check that percentages are formatted to two decimal places"""
@@ -33,7 +33,7 @@ def test_percentage_formatting(example_client):
     soup = BeautifulSoup(html, "html.parser")
     text = soup.get_text()
 
-    # Match percentages like "12.34%" (always two decimals)
+    # Match percentages
     percentages = re.findall(r"\d+\.\d{2}%", text)
 
     # If there are percentages on the page, ensure they match the 2-decimal format
