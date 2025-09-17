@@ -2,9 +2,9 @@ import sys, os
 import pytest
 
 # Ensure src is on sys.path
-#sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from src.run import app
+from run import app
 
 @pytest.fixture
 def example_client():

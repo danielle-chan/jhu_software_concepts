@@ -7,3 +7,6 @@ python -m pip install Flask
 brew install postgresql
 brew services start postgresql
 pip3 install "psycopg[binary]"
+
+
+pytest -v
