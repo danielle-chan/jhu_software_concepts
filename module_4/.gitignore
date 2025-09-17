@@ -1,0 +1,4 @@
+# Ignore the models folder
+src/llm_hosting/models/
+venv
+__pycache__
