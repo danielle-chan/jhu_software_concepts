@@ -19,3 +19,8 @@ def test_save_and_load_roundtrip(tmp_path):
     save_data(cleaned, file)
     loaded = load_data(file)
     assert loaded == cleaned
+
+@pytest.mark.clean
+def test_clean_data_handles_empty_list():
+    cleaned = clean_data([])
+    assert cleaned == []  # should just return empty without errors

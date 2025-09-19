@@ -1,4 +1,4 @@
-import sys, os, pytest
+import sys, os, pytest, subprocess
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 import constraint
@@ -27,3 +27,9 @@ def test_constraints_run_without_error():
             except Exception:
                 # we allow exceptions to still hit the code
                 pass
+
+def test_constraint_main_runs(tmp_path):
+    # run constraint.py as a script to hit the __main__ block
+    result = subprocess.run([sys.executable, "src/constraint.py"], capture_output=True, text=True)
+    # It should run without crashing
+    assert result.returncode == 0

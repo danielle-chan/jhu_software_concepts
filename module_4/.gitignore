@@ -2,3 +2,6 @@
 src/llm_hosting/models/
 venv
 __pycache__
+.coverage
+.coverage 2
+.coverage 3
