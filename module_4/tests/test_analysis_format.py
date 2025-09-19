@@ -13,6 +13,7 @@ def example_client():
     return app.test_client()
 
 
+@pytest.mark.analysis
 def test_answer_labels_present(example_client):
     """Check that 'Answer:' labels appear in the rendered analysis page"""
     response = example_client.get("/")
@@ -22,7 +23,7 @@ def test_answer_labels_present(example_client):
     # Look for "Answer:" at least once
     assert "Answer:" in html, "Expected 'Answer:' label not found in page"
     
-
+@pytest.mark.analysis
 def test_percentage_formatting(example_client):
     """Check that percentages are formatted to two decimal places"""
     response = example_client.get("/")
@@ -36,6 +37,9 @@ def test_percentage_formatting(example_client):
     # Match percentages
     percentages = re.findall(r"\d+\.\d{2}%", text)
 
-    # If there are percentages on the page, ensure they match the 2-decimal format
+     # Ensure at least one percentage is present
+    assert percentages, "Expected at least one percentage on the page"
+
+    # Ensure they all match the 2-decimal format
     for pct in percentages:
         assert re.match(r"^\d+\.\d{2}%$", pct), f"Bad percentage format: {pct}"

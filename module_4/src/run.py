@@ -1,5 +1,6 @@
 import psycopg
 import subprocess
+import os
 from flask import Flask, render_template, redirect, url_for, flash
 
 from append_data import append_data

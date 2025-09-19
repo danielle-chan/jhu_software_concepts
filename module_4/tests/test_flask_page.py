@@ -10,6 +10,7 @@ from run import app
 def example_client():
     return app.test_client()
 
+@pytest.mark.web
 def test_flask(example_client):
     response = example_client.get("/")
     assert response.status_code == 200
