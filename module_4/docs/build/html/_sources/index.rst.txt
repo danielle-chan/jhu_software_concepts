@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Module 4 Assignment documentation
+Grad Cafe App's Documentation!
 =================================
 
 Add your content using ``reStructuredText`` syntax. See the
@@ -16,4 +16,10 @@ documentation for details.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   overview
+   architecture
+   api_reference
+   testing
+   modules
 
