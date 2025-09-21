@@ -4,5 +4,5 @@ venv
 __pycache__
 .coverage
 .coverage 2
-.coverage 3*.zip
+.coverage 3
 *.zip

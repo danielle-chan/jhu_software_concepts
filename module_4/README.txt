@@ -22,3 +22,9 @@ trouble with __main__
 
 
 pip install sphinx-rtd-theme
+
+
+
+
+source module_4/venv/bin/activate
+pip install sphinx
