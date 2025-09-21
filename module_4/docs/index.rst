@@ -1,25 +1,26 @@
-.. Module 4 Assignment documentation master file, created by
-   sphinx-quickstart on Sun Sep 21 08:03:08 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Grad Cafe App's Documentation!
-=================================
+================================================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+This documentation provides an overview of the Grad Cafe application, setup instructions,
+system architecture, API reference, and testing guide.
 
-.. automodule:: add 
-   :members:
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Documentation:
 
    overview
    architecture
    api_reference
    testing
-   modules
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 
