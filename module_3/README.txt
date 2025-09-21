@@ -18,8 +18,8 @@ Installation:
 python -m venv venv
 source venv/bin/activate
 
-2. Then install the required Python packages:
-pip install -r requirements.txt
+2. Then install Flask
+python -m pip install Flask
 
 3. Install PostgreSQL (Mac)
 brew install postgresql
