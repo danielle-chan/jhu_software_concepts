@@ -1,16 +1,16 @@
-.. docs documentation master file, created by
-   sphinx-quickstart on Sat Sep 20 08:32:26 2025.
+.. Module 4 Assignment documentation master file, created by
+   sphinx-quickstart on Sun Sep 21 08:03:08 2025.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-docs documentation
-==================
+Module 4 Assignment documentation
+=================================
 
 Add your content using ``reStructuredText`` syntax. See the
 `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
 documentation for details.
 
-.. automodule:: add
+.. automodule:: add 
    :members:
 
 .. toctree::
