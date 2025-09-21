@@ -64,9 +64,15 @@ Some tests assert on specific selectors or strings in the rendered HTML:
 - **Buttons page**: looks for "Pull Data" and "Update Analysis".  
 - **Analysis page**: checks for formatted percentages and "Answer:" labels.  
 
-CI/CD Integration
+Continuous Integration (CI/CD)
 -----------------
 
-Coverage must remain at **100%**, enforced by the ``--cov-fail-under=100`` setting
-in ``pytest.ini``. Any new code should include tests to maintain this threshold.
-
+Coverage is enforced through the pytest-cov plugin and reported with the
+``--cov-report=term-missing`` option. This ensures that untested lines are
+clearly visible in the test output.
+Any new code should include tests to maintain high coverage and prevent
+regressions. While a strict threshold is not required, contributors are
+expected to write tests that keep the project's coverage strong and
+comprehensive.
+For automated checks, this project can be integrated with GitHub Actions
+to run the test suite on every commit and pull request.
