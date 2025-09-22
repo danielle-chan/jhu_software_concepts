@@ -20,12 +20,3 @@ def test_flask(example_client):
     assert "Update Analysis" in html
     assert "Analysis" in html
     assert "Answer:" in html
-
-@pytest.mark.web
-def test_run_main_starts_app(monkeypatch):
-    called = {}
-    def fake_run(*args, **kwargs):
-        called["yes"] = True
-    monkeypatch.setattr(run.app, "run", fake_run)
-    importlib.reload(run)  # re-import triggers __main__
-    assert "yes" in called

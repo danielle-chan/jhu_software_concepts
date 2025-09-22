@@ -41,13 +41,18 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview &amp; Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Testing Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#fixtures-doubles">Fixtures &amp; Doubles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#markers">Markers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fixtures-test-doubles">Fixtures &amp; Test Doubles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#expected-selectors">Expected Selectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-integration-ci-cd">Continuous Integration (CI/CD)</a></li>
 </ul>
 </li>
 </ul>
@@ -78,24 +83,72 @@
              
   <section id="testing-guide">
 <h1>Testing Guide<a class="headerlink" href="#testing-guide" title="Link to this heading"></a></h1>
-<p>Tests are grouped with markers for selective runs:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.web</span></code>: Flask page rendering</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.buttons</span></code>: Endpoint busy/redirect behavior</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.db</span></code>: Database schema, inserts, and constraints</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.integration</span></code>: End-to-end ETL + web flows</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.clean</span></code>: Data normalization</p></li>
-</ul>
-<p>Run only database tests:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;db&quot;</span>
+<p>This project uses <strong>pytest</strong> for automated testing, with coverage reporting
+enabled via <strong>pytest-cov</strong>.</p>
+<section id="running-tests">
+<h2>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
+<p>To run the entire suite with coverage:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>src<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
 </pre></div>
 </div>
-<section id="fixtures-doubles">
-<h2>Fixtures &amp; Doubles<a class="headerlink" href="#fixtures-doubles" title="Link to this heading"></a></h2>
+<p>This will show which lines of code are covered and highlight any missing coverage.</p>
+</section>
+<section id="markers">
+<h2>Markers<a class="headerlink" href="#markers" title="Link to this heading"></a></h2>
+<p>Tests are organized into categories using <code class="docutils literal notranslate"><span class="pre">pytest.ini</span></code> markers:</p>
 <ul class="simple">
-<li><p><strong>DummyConn / DummyCursor</strong>: Fake psycopg connections used in <code class="docutils literal notranslate"><span class="pre">test_query_data</span></code> and <code class="docutils literal notranslate"><span class="pre">test_load_data</span></code>.</p></li>
-<li><p><strong>monkeypatch</strong>: Used to override functions like <code class="docutils literal notranslate"><span class="pre">scrape_data</span></code> to prevent long runs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">web</span></code> → Page load / HTML structure</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">buttons</span></code> → Button endpoints &amp; busy-state behavior</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysis</span></code> → Labels and percentage formatting</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db</span></code> → Database schema/inserts/selects</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">integration</span></code> → End-to-end flows</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clean</span></code> → Data normalization, save/load</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scrape</span></code> → HTML parsing, fake urlopen</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load</span></code> → File insert, DB mock</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query</span></code> → SQL queries / reporting</p></li>
 </ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<p>Run only the <strong>query</strong> tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-m<span class="w"> </span>query
+</pre></div>
+</div>
+<p>Run both <strong>scrape</strong> and <strong>clean</strong> tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;scrape or clean&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="fixtures-test-doubles">
+<h2>Fixtures &amp; Test Doubles<a class="headerlink" href="#fixtures-test-doubles" title="Link to this heading"></a></h2>
+<p>Several tests use <strong>test doubles</strong> instead of real database or scraping calls:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DummyConn</span></code> and <code class="docutils literal notranslate"><span class="pre">DummyCursor</span></code> simulate a database connection for
+<code class="docutils literal notranslate"><span class="pre">query_data.py</span></code>.</p></li>
+<li><p>Monkeypatching replaces heavy operations with mocks, e.g.:
+- Fake versions of <code class="docutils literal notranslate"><span class="pre">scrape_data</span></code> return a small test dataset.
+- Flask’s <code class="docutils literal notranslate"><span class="pre">app.run()</span></code> is replaced with a no-op to prevent blocking.</p></li>
+</ul>
+</section>
+<section id="expected-selectors">
+<h2>Expected Selectors<a class="headerlink" href="#expected-selectors" title="Link to this heading"></a></h2>
+<p>Some tests assert on specific selectors or strings in the rendered HTML:</p>
+<ul class="simple">
+<li><p><strong>Buttons page</strong>: looks for “Pull Data” and “Update Analysis”.</p></li>
+<li><p><strong>Analysis page</strong>: checks for formatted percentages and “Answer:” labels.</p></li>
+</ul>
+</section>
+<section id="continuous-integration-ci-cd">
+<h2>Continuous Integration (CI/CD)<a class="headerlink" href="#continuous-integration-ci-cd" title="Link to this heading"></a></h2>
+<p>Coverage is enforced through the pytest-cov plugin and reported with the
+<code class="docutils literal notranslate"><span class="pre">--cov-report=term-missing</span></code> option. This ensures that untested lines are
+clearly visible in the test output.
+Any new code should include tests to maintain high coverage and prevent
+regressions. While a strict threshold is not required, contributors are
+expected to write tests that keep the project’s coverage strong and
+comprehensive.
+For automated checks, this project can be integrated with GitHub Actions
+to run the test suite on every commit and pull request.</p>
 </section>
 </section>
 

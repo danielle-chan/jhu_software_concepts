@@ -42,12 +42,13 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Documentation:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Overview &amp; Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#setup-instructions">Setup Instructions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#environment-variables">Environment Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-application">Running the Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
@@ -81,33 +82,100 @@
              
   <section id="overview-setup">
 <h1>Overview &amp; Setup<a class="headerlink" href="#overview-setup" title="Link to this heading"></a></h1>
-<p>The Grad Cafe application scrapes, cleans, and analyzes admissions data.</p>
-<section id="setup-instructions">
-<h2>Setup Instructions<a class="headerlink" href="#setup-instructions" title="Link to this heading"></a></h2>
-<ol class="arabic simple">
-<li><p>Clone the repository: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">&lt;your_repo_url&gt;</span></code></p></li>
-<li><p>Create and activate a virtual environment: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">venv</span> <span class="pre">venv</span> <span class="pre">&amp;&amp;</span> <span class="pre">source</span> <span class="pre">venv/bin/activate</span></code></p></li>
-<li><p>Install requirements: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code></p></li>
-</ol>
-</section>
-<section id="environment-variables">
-<h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading"></a></h2>
-<p>Set the following before running:</p>
+<p>This project implements an <strong>ETL + Web Application pipeline</strong> for analyzing
+applicant data scraped from the GradCafe forum. It combines scraping,
+cleaning, database loading, and a Flask web app to expose statistics.</p>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>The project requires:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">DATABASE_URL</span></code> (or <code class="docutils literal notranslate"><span class="pre">dbname</span></code> + <code class="docutils literal notranslate"><span class="pre">user</span></code> in <code class="docutils literal notranslate"><span class="pre">psycopg</span></code> connect)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">FLASK_ENV</span></code> (development or production)</p></li>
+<li><p>Python 3.13 (tested)</p></li>
+<li><p>PostgreSQL database</p></li>
+<li><p>A virtual environment with the dependencies listed in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code></p></li>
 </ul>
 </section>
-<section id="running-tests">
-<h2>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
-<p>Run all tests:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-v<span class="w"> </span>--cov<span class="o">=</span>src
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p><strong>Set Up Virtual Environment</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </pre></div>
 </div>
-<p>To run specific groups:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;db&quot;</span>
+</li>
+<li><p><strong>Set up PostgreSQL</strong>:
+Ensure PostgreSQL is installed and running locally.
+Create a database named <code class="docutils literal notranslate"><span class="pre">applicants</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>createdb<span class="w"> </span>applicants
 </pre></div>
 </div>
+</li>
+<li><p><strong>Environment Variables</strong>:</p>
+<p>The application connects to PostgreSQL using <code class="docutils literal notranslate"><span class="pre">psycopg</span></code>.
+By default, connection settings are hardcoded as:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>dbname=applicants
+user=&lt;your-username&gt;
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="running-the-application">
+<h2>Running the Application<a class="headerlink" href="#running-the-application" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p><strong>Scrape, clean, and load data</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/scrape.py
+python<span class="w"> </span>src/clean.py
+python<span class="w"> </span>src/load_data.py
+</pre></div>
+</div>
+</li>
+<li><p><strong>Run the Flask web app</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>src/run.py
+</pre></div>
+</div>
+<p>The app will be available at: <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a></p>
+</li>
+</ol>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading"></a></h2>
+<p>This project uses <strong>pytest</strong> for testing.</p>
+<ul>
+<li><p>To run all tests with coverage:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--cov<span class="o">=</span>src<span class="w"> </span>--cov-report<span class="o">=</span>term-missing
+</pre></div>
+</div>
+</li>
+<li><p>Tests are <strong>marked</strong> by category in <code class="docutils literal notranslate"><span class="pre">pytest.ini</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">web</span></code> → Page load / HTML structure</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">buttons</span></code> → Button endpoints &amp; busy-state behavior</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analysis</span></code> → Labels and percentage formatting</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">db</span></code> → Database schema/inserts/selects</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">integration</span></code> → End-to-end flows</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clean</span></code> → Data normalization, save/load</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scrape</span></code> → HTML parsing, fake urlopen</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load</span></code> → File insert, DB mock</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query</span></code> → SQL queries / reporting</p></li>
+</ul>
+</li>
+<li><p>Example: Run only the query tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-m<span class="w"> </span>query
+</pre></div>
+</div>
+</li>
+<li><p>Some tests use <strong>test doubles</strong>:
+- <code class="docutils literal notranslate"><span class="pre">DummyConn</span></code> and <code class="docutils literal notranslate"><span class="pre">DummyCursor</span></code> simulate a database connection for</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">query_data.py</span></code>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Monkeypatching is used to replace scraping/DB calls with lightweight mocks.</p></li>
+</ul>
+</li>
+</ul>
 </section>
 </section>
 

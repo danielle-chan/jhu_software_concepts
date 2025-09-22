@@ -7,7 +7,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 import run
 import append_data
 
-
 @pytest.fixture
 def example_client():
     return run.app.test_client()
