@@ -5,8 +5,6 @@ import json
 
 from src.scrape import scrape_data
 
-sys.path.append(os.path.dirname(__file__))
-
 def clean_data(raw_data):
     """Normalize raw scraped applicant records into a consistent dictionary list."""
     cleaned = []

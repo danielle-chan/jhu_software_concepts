@@ -1,16 +1,19 @@
-import psycopg
+"""Append new applicant rows to the database from the LLM-standardized JSONL file."""
 import json
+import psycopg
+from psycopg import Connection, Cursor
 
 def append_data(filename="llm_hosting/full_out.jsonl"):
     """Append new applicants into the database, skipping duplicates by URL"""
 
-    conn = psycopg.connect(
+    # pylint: disable=no-member
+    conn: Connection = psycopg.connect(
         dbname="applicants",
         user="daniellechan",
     )
-    cur = conn.cursor()
+    cur: Cursor = conn.cursor()
 
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         for line in f:
             entry = json.loads(line)
 
