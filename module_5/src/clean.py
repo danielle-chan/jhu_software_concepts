@@ -1,8 +1,14 @@
+"""Clean and normalize scraped GradCafe applicant data."""
+import sys
+import os
 import json
-from scrape import scrape_data
-import re
+
+from src.scrape import scrape_data
+
+sys.path.append(os.path.dirname(__file__))
 
 def clean_data(raw_data):
+    """Normalize raw scraped applicant records into a consistent dictionary list."""
     cleaned = []
 
     for entry in raw_data:
@@ -20,7 +26,7 @@ def clean_data(raw_data):
         # Clean comments
         cleaned_entry["comments"] = entry.get("comment", "N/A")
 
-        # Clean date added 
+        # Clean date added
         cleaned_entry["date_added"] = entry.get("date_added", "N/A")
 
         # Clean applicant status
@@ -29,7 +35,7 @@ def clean_data(raw_data):
         # Clean URL
         cleaned_entry["url"] = entry.get("url", "N/A")
 
-        # Clean GPA 
+        # Clean GPA
         cleaned_entry["GPA"] = entry.get("gpa", "N/A")
 
         # Clean GRE G
@@ -53,20 +59,20 @@ def clean_data(raw_data):
 
 
 def save_data(cleaned_data, filename="cleaned_applicant_data.json"):
-    # Saves cleaned data into JSON file
+    """Save cleaned data to a JSON file."""
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(cleaned_data, f, indent=4, ensure_ascii=False)
 
 
 def load_data(filename="cleaned_applicant_data.json"):
-    # Loads cleaned data from JSON file
+    """Load cleaned data from a JSON file."""
     with open(filename, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 if __name__ == "__main__":
-    raw_data = scrape_data(pages=1500)  # scrape first 1500 pages
-    structured_data = clean_data(raw_data)
+    scraped = scrape_data(pages=1500)  # scrape first 1500 pages
+    structured_data = clean_data(scraped)
 
     save_data(structured_data)  # save to JSON
     loaded_data = load_data()   # load back

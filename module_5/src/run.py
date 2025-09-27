@@ -1,31 +1,33 @@
-import psycopg
+"""Main Flask application for the GradCafe ETL dashboard."""
+
 import subprocess
-import os
+
+import psycopg
 from flask import Flask, render_template, redirect, url_for, flash
 
-from append_data import append_data
+from src.append_data import append_data
 
-is_running = False
+# pylint: disable=no-member  # psycopg cursor/connection false positives
+
+IS_RUNNING = False  # global flag to block simultaneous updates
 
 # Create the Flask application using the factory function defined within __init__.py
 app = Flask(__name__)
 app.secret_key = "secret_key" # Need a secret key to use flash
 
 def get_db_connection():
-    """A function to connect to the database"""
-
-    connection = psycopg.connect(
+    """Create and return a connection to the applicants database."""
+    return psycopg.connect(
         dbname="applicants",
         user="daniellechan",
     )
 
-    return connection
-
 @app.route('/')
 def index():
+    """Render the dashboard with all current statistics."""
     conn = get_db_connection()
     cur = conn.cursor()
-    
+
     # 1. How many applied for Fall 2025
     cur.execute("""
         SELECT COUNT(*)
@@ -132,7 +134,7 @@ def index():
 
     gtown_apps = cur.fetchone()[0]
 
-    # 9. Fall 2025 data science applicants 
+    # 9. Fall 2025 data science applicants
     cur.execute("""
     SELECT COUNT(*)
         FROM applicants
@@ -154,7 +156,7 @@ def index():
             OR gre_aw IS NOT NULL;
     """)
 
-    count_GRE = cur.fetchone()[0]
+    count_gre = cur.fetchone()[0]
 
     cur.close()
     conn.close()
@@ -173,7 +175,7 @@ def index():
         jhu_apps=jhu_apps,
         gtown_apps=gtown_apps,
         ds_apps=ds_apps,
-        count_GRE=count_GRE
+        count_gre=count_gre
     )
 
 
@@ -202,12 +204,11 @@ def pull_data():
 
 @app.route("/update_analysis")
 def update_analysis():
-    global is_running
-    if is_running:
+    """Trigger a refresh of analysis unless a pull is running."""
+    if IS_RUNNING:
         flash("Please wait. Cannot update analysis while a data pull is running.")
         return redirect(url_for("index"))
 
-    # Just reloading the analysis
     flash("Analysis updated with the latest data.")
     return redirect(url_for("index"))
 
