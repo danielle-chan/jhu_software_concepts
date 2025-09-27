@@ -1,0 +1,11 @@
+Flask
+psycopg[binary]
+beautifulsoup4
+
+pytest
+pytest-cov
+
+sphinx
+sphinx-rtd-theme
+
+pylint

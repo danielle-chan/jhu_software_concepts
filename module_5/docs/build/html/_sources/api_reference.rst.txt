@@ -1,0 +1,40 @@
+API Reference
+=============
+
+This section documents the main modules in the Grad Cafe application.
+
+.. automodule:: scrape
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: clean
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: load_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: query_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: run
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: append_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: constraint
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
