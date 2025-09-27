@@ -1,52 +1,63 @@
-import psycopg
+"""Load cleaned and standardized GradCafe applicant data into the PostgreSQL database."""
+
 import json
+import psycopg
 
-# Connect to database applicants
-conn = psycopg.connect(
-    dbname="applicants",  
-    user="daniellechan",   
-)
+# pylint: disable=no-member  # psycopg connections/cursors trigger false positives
 
-# Open a cursor to perform database operations
-cur = conn.cursor()
 
-# Clear out old data before inserting fresh rows
-cur.execute("TRUNCATE TABLE applicants;")
+def load_data_from_jsonl(file_path="src/llm_hosting/full_out.jsonl"):
+    """Truncate the applicants table and load all rows from the given JSONL file."""
+    conn = psycopg.connect(
+        dbname="applicants",
+        user="daniellechan",
+    )
+    cur = conn.cursor()
 
-with open("src/llm_hosting/full_out.jsonl", "r") as f:
-    for line in f:
-        entry = json.loads(line)
+    # Clear old data
+    cur.execute("TRUNCATE TABLE applicants;")
 
-        # Replace "N/A" with None for nullable fields
-        def clean_val(v):
-            return None if v in ("N/A", "", None) else v
+    with open(file_path, "r", encoding="utf-8") as f:
+        for line in f:
+            entry = json.loads(line)
 
-        cur.execute("""
-            INSERT INTO applicants (
-                program, degree, comments, date_added, status, url,
-                gpa, gre, gre_v, gre_aw, term, us_or_international,
-                llm_generated_program, llm_generated_university, university
+            def clean_val(v):
+                return None if v in ("N/A", "", None) else v
+
+            cur.execute(
+                """
+                INSERT INTO applicants (
+                    program, degree, comments, date_added, status, url,
+                    gpa, gre, gre_v, gre_aw, term, us_or_international,
+                    llm_generated_program, llm_generated_university, university
+                )
+                VALUES (%s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s)
+                """,
+                (
+                    clean_val(entry.get("program")),
+                    clean_val(entry.get("degree_type")),
+                    clean_val(entry.get("comments")),
+                    clean_val(entry.get("date_added")),
+                    clean_val(entry.get("status")),
+                    clean_val(entry.get("url")),
+                    clean_val(entry.get("GPA")),
+                    clean_val(entry.get("GRE_G")),
+                    clean_val(entry.get("GRE_V")),
+                    clean_val(entry.get("GRE_AW")),
+                    clean_val(entry.get("term")),
+                    clean_val(entry.get("US/International")),
+                    clean_val(entry.get("llm-generated-program")),
+                    clean_val(entry.get("llm-generated-university")),
+                    clean_val(entry.get("university")),
+                ),
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (
-            clean_val(entry.get("program")),
-            clean_val(entry.get("degree_type")),
-            clean_val(entry.get("comments")),
-            clean_val(entry.get("date_added")),
-            clean_val(entry.get("status")),
-            clean_val(entry.get("url")),
-            clean_val(entry.get("GPA")),
-            clean_val(entry.get("GRE_G")),
-            clean_val(entry.get("GRE_V")),
-            clean_val(entry.get("GRE_AW")),
-            clean_val(entry.get("term")),
-            clean_val(entry.get("US/International")),
-            clean_val(entry.get("llm-generated-program")),
-            clean_val(entry.get("llm-generated-university")),
-            clean_val(entry.get("university"))
-        ))
 
-# Commit and close
-conn.commit()
-cur.close()
-conn.close()
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+if __name__ == "__main__":
+    load_data_from_jsonl()

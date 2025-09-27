@@ -1,58 +1,3 @@
-************* Module src
-src/__init__.py:1:0: C0304: Final newline missing (missing-final-newline)
-************* Module src.constraint
-src/constraint.py:20:0: C0305: Trailing newlines (trailing-newlines)
-src/constraint.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/constraint.py:4:0: C0116: Missing function or method docstring (missing-function-docstring)
-src/constraint.py:9:10: E1101: Class 'value' has no 'cursor' member (no-member)
-src/constraint.py:14:4: E1101: Class 'value' has no 'commit' member (no-member)
-src/constraint.py:16:4: E1101: Class 'value' has no 'close' member (no-member)
-************* Module src.run
-src/run.py:28:0: C0303: Trailing whitespace (trailing-whitespace)
-src/run.py:135:42: C0303: Trailing whitespace (trailing-whitespace)
-src/run.py:217:0: C0304: Final newline missing (missing-final-newline)
-src/run.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/run.py:6:0: E0401: Unable to import 'append_data' (import-error)
-src/run.py:8:0: C0103: Constant name "is_running" doesn't conform to UPPER_CASE naming style (invalid-name)
-src/run.py:25:0: C0116: Missing function or method docstring (missing-function-docstring)
-src/run.py:27:10: E1101: Class 'value' has no 'cursor' member (no-member)
-src/run.py:157:4: C0103: Variable name "count_GRE" doesn't conform to snake_case naming style (invalid-name)
-src/run.py:160:4: E1101: Class 'value' has no 'close' member (no-member)
-src/run.py:204:0: C0116: Missing function or method docstring (missing-function-docstring)
-src/run.py:205:4: W0602: Using global for 'is_running' but no assignment is done (global-variable-not-assigned)
-src/run.py:2:0: C0411: standard import "subprocess" should be placed before third party import "psycopg" (wrong-import-order)
-src/run.py:3:0: C0411: standard import "os" should be placed before third party import "psycopg" (wrong-import-order)
-src/run.py:3:0: W0611: Unused import os (unused-import)
-************* Module src.clean
-src/clean.py:23:26: C0303: Trailing whitespace (trailing-whitespace)
-src/clean.py:32:19: C0303: Trailing whitespace (trailing-whitespace)
-src/clean.py:75:0: C0304: Final newline missing (missing-final-newline)
-src/clean.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/clean.py:2:0: E0401: Unable to import 'scrape' (import-error)
-src/clean.py:5:0: C0116: Missing function or method docstring (missing-function-docstring)
-src/clean.py:5:15: W0621: Redefining name 'raw_data' from outer scope (line 68) (redefined-outer-name)
-src/clean.py:55:0: C0116: Missing function or method docstring (missing-function-docstring)
-src/clean.py:61:0: C0116: Missing function or method docstring (missing-function-docstring)
-src/clean.py:3:0: C0411: standard import "re" should be placed before first party import "scrape.scrape_data"  (wrong-import-order)
-src/clean.py:3:0: W0611: Unused import re (unused-import)
-************* Module src.append_data
-src/append_data.py:48:0: C0304: Final newline missing (missing-final-newline)
-src/append_data.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/append_data.py:11:10: E1101: Class 'value' has no 'cursor' member (no-member)
-src/append_data.py:13:9: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
-src/append_data.py:46:4: E1101: Class 'value' has no 'commit' member (no-member)
-src/append_data.py:48:4: E1101: Class 'value' has no 'close' member (no-member)
-src/append_data.py:2:0: C0411: standard import "json" should be placed before third party import "psycopg" (wrong-import-order)
-************* Module src.query_data
-src/query_data.py:5:24: C0303: Trailing whitespace (trailing-whitespace)
-src/query_data.py:6:24: C0303: Trailing whitespace (trailing-whitespace)
-src/query_data.py:29:0: C0301: Line too long (141/100) (line-too-long)
-src/query_data.py:51:69: C0303: Trailing whitespace (trailing-whitespace)
-src/query_data.py:94:0: C0301: Line too long (133/100) (line-too-long)
-src/query_data.py:173:0: C0304: Final newline missing (missing-final-newline)
-src/query_data.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-src/query_data.py:10:6: E1101: Class 'value' has no 'cursor' member (no-member)
-src/query_data.py:173:0: E1101: Class 'value' has no 'close' member (no-member)
 ************* Module src.load_data
 src/load_data.py:6:24: C0303: Trailing whitespace (trailing-whitespace)
 src/load_data.py:7:24: C0303: Trailing whitespace (trailing-whitespace)
@@ -64,10 +9,21 @@ src/load_data.py:21:8: C0116: Missing function or method docstring (missing-func
 src/load_data.py:50:0: E1101: Class 'value' has no 'commit' member (no-member)
 src/load_data.py:52:0: E1101: Class 'value' has no 'close' member (no-member)
 src/load_data.py:2:0: C0411: standard import "json" should be placed before third party import "psycopg" (wrong-import-order)
+************* Module src.query_data
+src/query_data.py:5:24: C0303: Trailing whitespace (trailing-whitespace)
+src/query_data.py:6:24: C0303: Trailing whitespace (trailing-whitespace)
+src/query_data.py:29:0: C0301: Line too long (141/100) (line-too-long)
+src/query_data.py:51:69: C0303: Trailing whitespace (trailing-whitespace)
+src/query_data.py:94:0: C0301: Line too long (133/100) (line-too-long)
+src/query_data.py:173:0: C0304: Final newline missing (missing-final-newline)
+src/query_data.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/query_data.py:10:6: E1101: Class 'value' has no 'cursor' member (no-member)
+src/query_data.py:173:0: E1101: Class 'value' has no 'close' member (no-member)
 ************* Module src.scrape
 src/scrape.py:55:0: C0301: Line too long (140/100) (line-too-long)
 src/scrape.py:68:0: C0303: Trailing whitespace (trailing-whitespace)
 src/scrape.py:73:0: C0301: Line too long (103/100) (line-too-long)
+src/scrape.py:109:0: C0304: Final newline missing (missing-final-newline)
 src/scrape.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 src/scrape.py:6:0: C0116: Missing function or method docstring (missing-function-docstring)
 src/scrape.py:6:0: R0914: Too many local variables (34/15) (too-many-locals)
@@ -76,310 +32,162 @@ src/scrape.py:6:0: R0912: Too many branches (22/12) (too-many-branches)
 src/scrape.py:6:0: R0915: Too many statements (57/50) (too-many-statements)
 src/scrape.py:15:15: R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
 src/scrape.py:3:0: C0411: standard import "urllib.request.urlopen" should be placed before third party import "bs4.BeautifulSoup" (wrong-import-order)
-************* Module tests.test_flask_page
-tests/test_flask_page.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_flask_page.py:1:0: C0410: Multiple imports on one line (sys, os) (multiple-imports)
-tests/test_flask_page.py:8:0: E0401: Unable to import 'run' (import-error)
-tests/test_flask_page.py:8:0: C0413: Import "from run import app" should be placed at the top of the module (wrong-import-position)
-tests/test_flask_page.py:11:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_flask_page.py:15:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_flask_page.py:15:15: W0621: Redefining name 'example_client' from outer scope (line 11) (redefined-outer-name)
-tests/test_flask_page.py:3:0: C0411: standard import "importlib" should be placed before third party import "pytest" (wrong-import-order)
-tests/test_flask_page.py:3:0: W0611: Unused import importlib (unused-import)
-************* Module tests.test_analysis_format
-tests/test_analysis_format.py:25:0: C0303: Trailing whitespace (trailing-whitespace)
-tests/test_analysis_format.py:45:0: C0304: Final newline missing (missing-final-newline)
-tests/test_analysis_format.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_analysis_format.py:4:0: C0410: Multiple imports on one line (sys, os) (multiple-imports)
-tests/test_analysis_format.py:9:0: E0401: Unable to import 'run' (import-error)
-tests/test_analysis_format.py:9:0: C0413: Import "from run import app" should be placed at the top of the module (wrong-import-position)
-tests/test_analysis_format.py:12:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_analysis_format.py:17:31: W0621: Redefining name 'example_client' from outer scope (line 12) (redefined-outer-name)
-tests/test_analysis_format.py:27:31: W0621: Redefining name 'example_client' from outer scope (line 12) (redefined-outer-name)
-tests/test_analysis_format.py:4:0: C0411: standard import "sys" should be placed before third party imports "pytest", "bs4.BeautifulSoup" (wrong-import-order)
-tests/test_analysis_format.py:4:0: C0411: standard import "os" should be placed before third party imports "pytest", "bs4.BeautifulSoup" (wrong-import-order)
-************* Module tests.test_load_data
-tests/test_load_data.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_load_data.py:1:0: C0410: Multiple imports on one line (sys, os, json, importlib) (multiple-imports)
-tests/test_load_data.py:5:0: E0401: Unable to import 'load_data' (import-error)
-tests/test_load_data.py:5:0: C0413: Import "import load_data" should be placed at the top of the module (wrong-import-position)
-tests/test_load_data.py:8:0: C0115: Missing class docstring (missing-class-docstring)
-tests/test_load_data.py:12:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_load_data.py:15:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_load_data.py:19:0: C0115: Missing class docstring (missing-class-docstring)
-tests/test_load_data.py:24:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_load_data.py:27:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_load_data.py:30:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_load_data.py:34:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_load_data.py:55:9: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
-tests/test_load_data.py:66:4: W1113: Keyword argument before variable positional arguments list in the definition of fake_open function (keyword-arg-before-vararg)
-************* Module tests.test_query_data
-tests/test_query_data.py:53:0: C0304: Final newline missing (missing-final-newline)
-tests/test_query_data.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_query_data.py:1:0: C0410: Multiple imports on one line (sys, os, importlib) (multiple-imports)
-tests/test_query_data.py:7:0: E0401: Unable to import 'query_data' (import-error)
-tests/test_query_data.py:7:0: C0413: Import "import query_data" should be placed at the top of the module (wrong-import-position)
-tests/test_query_data.py:18:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_query_data.py:21:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_query_data.py:24:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_query_data.py:27:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_query_data.py:31:0: C0115: Missing class docstring (missing-class-docstring)
-tests/test_query_data.py:35:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_query_data.py:38:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_query_data.py:41:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_query_data.py:46:25: W0613: Unused argument 'monkeypatch' (unused-argument)
-tests/test_query_data.py:46:38: W0613: Unused argument 'capsys' (unused-argument)
-tests/test_query_data.py:1:0: W0611: Unused import importlib (unused-import)
-tests/test_query_data.py:7:0: W0611: Unused import query_data (unused-import)
-************* Module tests.test_scrape
-tests/test_scrape.py:78:0: C0304: Final newline missing (missing-final-newline)
-tests/test_scrape.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_scrape.py:1:0: C0410: Multiple imports on one line (sys, os, pytest) (multiple-imports)
-tests/test_scrape.py:4:0: E0401: Unable to import 'scrape' (import-error)
-tests/test_scrape.py:4:0: C0413: Import "import scrape" should be placed at the top of the module (wrong-import-position)
-tests/test_scrape.py:7:0: C0115: Missing class docstring (missing-class-docstring)
-tests/test_scrape.py:10:4: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_scrape.py:7:0: R0903: Too few public methods (1/2) (too-few-public-methods)
-tests/test_scrape.py:14:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_scrape.py:39:21: W0613: Unused argument 'url' (unused-argument)
-tests/test_scrape.py:56:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_scrape.py:73:4: C0115: Missing class docstring (missing-class-docstring)
-tests/test_scrape.py:74:34: C0321: More than one statement on a single line (multiple-statements)
-tests/test_scrape.py:75:8: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_scrape.py:75:24: C0321: More than one statement on a single line (multiple-statements)
-tests/test_scrape.py:73:4: R0903: Too few public methods (1/2) (too-few-public-methods)
-************* Module tests.test_buttons
-tests/test_buttons.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_buttons.py:1:0: C0410: Multiple imports on one line (sys, os) (multiple-imports)
-tests/test_buttons.py:7:0: E0401: Unable to import 'run' (import-error)
-tests/test_buttons.py:7:0: C0413: Import "import run" should be placed at the top of the module (wrong-import-position)
-tests/test_buttons.py:8:0: E0401: Unable to import 'append_data' (import-error)
-tests/test_buttons.py:8:0: C0413: Import "import append_data" should be placed at the top of the module (wrong-import-position)
-tests/test_buttons.py:11:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_buttons.py:16:29: W0621: Redefining name 'example_client' from outer scope (line 11) (redefined-outer-name)
-tests/test_buttons.py:31:35: W0621: Redefining name 'example_client' from outer scope (line 11) (redefined-outer-name)
-tests/test_buttons.py:41:36: W0621: Redefining name 'example_client' from outer scope (line 11) (redefined-outer-name)
-tests/test_buttons.py:8:0: W0611: Unused import append_data (unused-import)
-************* Module tests.test_db_insert
-tests/test_db_insert.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_db_insert.py:5:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_db_insert.py:11:4: E1101: Class 'value' has no 'rollback' member (no-member)
-tests/test_db_insert.py:12:4: E1101: Class 'value' has no 'close' member (no-member)
-tests/test_db_insert.py:15:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_db_insert.py:15:27: W0621: Redefining name 'db_connection' from outer scope (line 5) (redefined-outer-name)
-tests/test_db_insert.py:51:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_db_insert.py:51:37: W0621: Redefining name 'db_connection' from outer scope (line 5) (redefined-outer-name)
-************* Module tests.test_integration_end_to_end
-tests/test_integration_end_to_end.py:61:0: C0304: Final newline missing (missing-final-newline)
-tests/test_integration_end_to_end.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_integration_end_to_end.py:1:0: C0410: Multiple imports on one line (sys, os, json) (multiple-imports)
-tests/test_integration_end_to_end.py:5:0: E0401: Unable to import 'run' (import-error)
-tests/test_integration_end_to_end.py:5:0: C0413: Import "import run" should be placed at the top of the module (wrong-import-position)
-tests/test_integration_end_to_end.py:6:0: E0401: Unable to import 'append_data' (import-error)
-tests/test_integration_end_to_end.py:6:0: C0413: Import "import append_data" should be placed at the top of the module (wrong-import-position)
-tests/test_integration_end_to_end.py:10:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_integration_end_to_end.py:15:25: W0621: Redefining name 'example_client' from outer scope (line 10) (redefined-outer-name)
-tests/test_integration_end_to_end.py:39:9: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)
-************* Module tests.test_clean
-tests/test_clean.py:26:0: C0304: Final newline missing (missing-final-newline)
-tests/test_clean.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_clean.py:2:0: W0404: Reimport 'json' (imported line 1) (reimported)
-tests/test_clean.py:2:0: C0410: Multiple imports on one line (sys, os, json) (multiple-imports)
-tests/test_clean.py:7:0: E0401: Unable to import 'clean' (import-error)
-tests/test_clean.py:7:0: C0413: Import "from clean import clean_data, save_data, load_data" should be placed at the top of the module (wrong-import-position)
-tests/test_clean.py:10:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_clean.py:16:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_clean.py:24:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_clean.py:2:0: C0412: Imports from package json are not grouped (ungrouped-imports)
-tests/test_clean.py:1:0: W0611: Unused import json (unused-import)
-************* Module tests.test_constraint
-tests/test_constraint.py:35:0: C0304: Final newline missing (missing-final-newline)
-tests/test_constraint.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-tests/test_constraint.py:1:0: C0410: Multiple imports on one line (sys, os, pytest, subprocess) (multiple-imports)
-tests/test_constraint.py:4:0: E0401: Unable to import 'constraint' (import-error)
-tests/test_constraint.py:4:0: C0413: Import "import constraint" should be placed at the top of the module (wrong-import-position)
-tests/test_constraint.py:27:19: W0718: Catching too general exception Exception (broad-exception-caught)
-tests/test_constraint.py:31:0: C0116: Missing function or method docstring (missing-function-docstring)
-tests/test_constraint.py:33:13: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
-tests/test_constraint.py:31:30: W0613: Unused argument 'tmp_path' (unused-argument)
-tests/test_constraint.py:1:0: C0411: standard import "subprocess" should be placed before third party import "pytest" (wrong-import-order)
-tests/test_constraint.py:1:0: W0611: Unused import pytest (unused-import)
-tests/test_constraint.py:1:0: R0801: Similar lines in 2 files
+src/scrape.py:1:0: R0801: Similar lines in 2 files
 ==src.query_data:[38:166]
-==src.run:[48:183]
-    FROM applicants
-""")
+==src.run:[50:185]
+        FROM applicants
+    """)
 
-avg_gpa, avg_gre, avg_gre_v, avg_gre_aw = cur.fetchone()
-
-print("Averages:")
-print(f"  GPA   : {avg_gpa:.2f}" if avg_gpa else "  GPA   : No data")
-print(f"  GRE   : {avg_gre:.2f}" if avg_gre else "  GRE   : No data")
-print(f"  GRE V : {avg_gre_v:.2f}" if avg_gre_v else "  GRE V : No data")
-print(f"  GRE AW: {avg_gre_aw:.2f}" if avg_gre_aw else "  GRE AW: No data")
+    avg_gpa, avg_gre, avg_gre_v, avg_gre_aw = cur.fetchone()
 
 
-# Calculate the average GPA of all American applicants from Fall 2025
-cur.execute("""
-    SELECT AVG(gpa) AS avg_gpa
-    FROM applicants
-    WHERE term = 'Fall 2025'
-    AND us_or_international = 'American'
-    AND gpa IS NOT NULL;
-""")
+    # 4. Average GPA of American students
+    cur.execute("""
+        SELECT AVG(gpa) AS avg_gpa
+        FROM applicants
+        WHERE term = 'Fall 2025'
+        AND us_or_international = 'American'
+        AND gpa IS NOT NULL;
+    """)
 
-avg_gpa = cur.fetchone()[0]
-
-if avg_gpa:
-    print(f"Average GPA of American applicants in Fall 2025: {avg_gpa:.2f}")
-else:
-    print("No GPA data available for American applicants in Fall 2025.")
+    avg_gpa_american = cur.fetchone()[0]
 
 
-# Calculate the percent of acceptances from Fall 2025
-cur.execute("""
-    SELECT
-        100.0 * COUNT(*) FILTER (WHERE status ILIKE 'Accepted%') / COUNT(*)
-    FROM applicants
-    WHERE term = 'Fall 2025'
-""")
+    # 5. Percent acceptences for Fall 2025
+    cur.execute("""
+        SELECT
+            100.0 * COUNT(*) FILTER (WHERE status ILIKE 'Accepted%') / COUNT(*)
+        FROM applicants
+        WHERE term = 'Fall 2025'
+    """)
 
-percent_acceptances = cur.fetchone()[0]
-
-if percent_acceptances is not None:
-    print(f"Percentage of Fall 2025 entries that are Acceptances: {percent_acceptances:.2f}%")
-else:
-    print("No entries found for Fall 2025.")
+    percent_acceptances = cur.fetchone()[0]
 
 
-# Select average GPA of applicants who applied for Fall 2025 and were accepted
-cur.execute("""
-    SELECT AVG(gpa) AS avg_gpa_fall2025_acceptances
-    FROM applicants
-    WHERE term = 'Fall 2025'
-      AND status ILIKE '%Accepted%'
-      AND gpa IS NOT NULL;
-""")
+    # 6. Average GPA of acceptances from Fall 2025
+    cur.execute("""
+        SELECT AVG(gpa) AS avg_gpa_fall2025_acceptances
+        FROM applicants
+        WHERE term = 'Fall 2025'
+        AND status ILIKE '%Accepted%'
+        AND gpa IS NOT NULL;
+    """)
 
-avg_gpa_accepted = cur.fetchone()
-print(f"Average GPA of accepted applicants for Fall 2025: {avg_gpa_accepted[0]:.2f}" if avg_gpa_accepted[0] else "No data available")
-
-
-# Select applicants who applied to JHU for a masters degree in CS
-cur.execute("""
-    SELECT COUNT(*)
-    FROM applicants
-    WHERE (
-        llm_generated_university ILIKE '%Johns Hopkins%'
-        OR llm_generated_university ILIKE '%JHU%'
-        OR llm_generated_university ILIKE '%Hopkins%'
-    )
-    AND (
-        llm_generated_program ILIKE '%Computer Science%'
-    )
-    AND (
-        degree ILIKE '%Master%'
-        OR degree ILIKE '%MS%'
-        OR degree ILIKE '%M.S.%'
-        OR degree ILIKE '%Masters%'
-    );
-""")
-
-jhu_apps = cur.fetchone()
-print(f"Number of applicants to JHU for a Master's in Computer Science: {jhu_apps[0]}")
+    avg_gpa_accepted = cur.fetchone()[0]
 
 
-# Select applicants who applied in 2025 for Georgetown's PhD in CS
-cur.execute("""
-    SELECT COUNT(*)
-    FROM applicants
-    WHERE
-        term ILIKE '%2025%'
-        AND status ILIKE '%Accept%'
-        AND (
-            llm_generated_university ILIKE '%Georgetown%'
-        )
-        AND (
-            degree ILIKE '%PhD%'
-            OR degree ILIKE '%Ph.D.%'
-            OR degree ILIKE '%Doctorate%'
+    # 7. Applicants who applied to JHU for master's in CS
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM applicants
+        WHERE (
+            llm_generated_university ILIKE '%Johns Hopkins%'
+            OR llm_generated_university ILIKE '%JHU%'
+            OR llm_generated_university ILIKE '%Hopkins%'
         )
         AND (
             llm_generated_program ILIKE '%Computer Science%'
-        );
-""")
-
-gtown_apps = cur.fetchone()
-print(f"Number of 2025 Georgetown PhD Computer Science acceptances: {gtown_apps[0]}")
-
-
-# Select applicants who applied in 2025 for Data Science
-cur.execute("""
-    SELECT COUNT(*)
-    FROM applicants
-    WHERE
-        term ILIKE '%Fall 2025%'
+        )
         AND (
-            llm_generated_program ILIKE '%Data Science%'
+            degree ILIKE '%Master%'
+            OR degree ILIKE '%MS%'
+            OR degree ILIKE '%M.S.%'
+            OR degree ILIKE '%Masters%'
         );
-""")
+    """)
 
-ds_apps = cur.fetchone()
-print(f"Number of Fall 2025 Data Science applicants: {ds_apps[0]}")
-
-
-# Select all students who submitted any type of GRE score
-cur.execute("""
-    SELECT COUNT(*)
-    FROM applicants
-    WHERE gre IS NOT NULL
-       OR gre_v IS NOT NULL
-       OR gre_aw IS NOT NULL; (duplicate-code)
-tests/test_constraint.py:1:0: R0801: Similar lines in 2 files
-==src.append_data:[13:26]
-==src.load_data:[16:30]
-        for line in f:
-            entry = json.loads(line)
-
-            def clean_val(v):
-                return None if v in ("N/A", "", None) else v
-
-            cur.execute("""
-                INSERT INTO applicants (
-                    program, degree, comments, date_added, status, url,
-                    gpa, gre, gre_v, gre_aw, term, us_or_international,
-                    llm_generated_program, llm_generated_university, university
-                )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) (duplicate-code)
-tests/test_constraint.py:1:0: R0801: Similar lines in 2 files
-==tests.test_analysis_format:[6:23]
-==tests.test_flask_page:[5:18]
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-
-from run import app
-
-@pytest.fixture
-def example_client():
-    return app.test_client()
+    jhu_apps = cur.fetchone()[0]
 
 
-@pytest.mark.analysis
-def test_answer_labels_present(example_client):
-    """Check that 'Answer:' labels appear in the rendered analysis page"""
-    response = example_client.get("/")
-    assert response.status_code == 200
-    html = response.get_data(as_text=True)
-
-    # Look for "Answer:" at least once (duplicate-code)
-tests/test_constraint.py:1:0: R0801: Similar lines in 2 files
-==src.append_data:[19:24]
-==tests.test_db_insert:[18:23]
+    # 8. 2025 applicants who applied to Georgwtown for PhD in CS
     cur.execute("""
-        INSERT INTO applicants (
-            program, degree, comments, date_added, status, url,
-            gpa, gre, gre_v, gre_aw, term, us_or_international,
-            llm_generated_program, llm_generated_university, university (duplicate-code)
+        SELECT COUNT(*)
+        FROM applicants
+        WHERE
+            term ILIKE '%2025%'
+            AND status ILIKE '%Accept%'
+            AND (
+                llm_generated_university ILIKE '%Georgetown%'
+            )
+            AND (
+                degree ILIKE '%PhD%'
+                OR degree ILIKE '%Ph.D.%'
+                OR degree ILIKE '%Doctorate%'
+            )
+            AND (
+                llm_generated_program ILIKE '%Computer Science%'
+            );
+    """)
+
+    gtown_apps = cur.fetchone()[0]
+
+    # 9. Fall 2025 data science applicants
+    cur.execute("""
+    SELECT COUNT(*)
+        FROM applicants
+        WHERE
+            term ILIKE '%Fall 2025%'
+            AND (
+                llm_generated_program ILIKE '%Data Science%'
+            );
+    """)
+
+    ds_apps = cur.fetchone()[0]
+
+    # 10. Number of applicants who submitted a GRE score
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM applicants
+        WHERE gre IS NOT NULL
+            OR gre_v IS NOT NULL
+            OR gre_aw IS NOT NULL;
+    """)
+
+    count_gre = cur.fetchone()[0]
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        'index.html',
+        count=count,
+        percent_international=percent_international,
+        avg_gpa=avg_gpa,
+        avg_gre=avg_gre,
+        avg_gre_v=avg_gre_v,
+        avg_gre_aw=avg_gre_aw,
+        avg_gpa_american=avg_gpa_american,
+        percent_acceptances=percent_acceptances,
+        avg_gpa_accepted=avg_gpa_accepted,
+        jhu_apps=jhu_apps,
+        gtown_apps=gtown_apps,
+        ds_apps=ds_apps,
+        count_gre=count_gre
+    )
+
+
+@app.route('/pull_data')
+def pull_data():
+    """Scrape, clean, standardize , append new data"""
+    # 1. Scrape raw data (duplicate-code)
+src/scrape.py:1:0: R0801: Similar lines in 2 files
+==src.append_data:[16:29]
+==src.load_data:[16:30]
+    for line in f:
+        entry = json.loads(line)
+
+        # Replace "N/A" with None for nullable fields
+        def clean_val(v):
+            return None if v in ("N/A", "", None) else v
+
+        cur.execute("""
+            INSERT INTO applicants (
+                program, degree, comments, date_added, status, url,
+                gpa, gre, gre_v, gre_aw, term, us_or_international,
+                llm_generated_program, llm_generated_university, university
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) (duplicate-code)
 
 ------------------------------------------------------------------
-Your code has been rated at 3.65/10 (previous run: 3.65/10, +0.00)
+Your code has been rated at 7.70/10 (previous run: 7.65/10, +0.04)
 

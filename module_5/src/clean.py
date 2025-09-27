@@ -1,6 +1,4 @@
 """Clean and normalize scraped GradCafe applicant data."""
-import sys
-import os
 import json
 
 from src.scrape import scrape_data
