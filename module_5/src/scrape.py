@@ -1,109 +1,110 @@
+"""Scrape GradCafe applicant data."""
+
+# pylint: disable=too-many-locals, too-many-branches, invalid-name
+
+from urllib.request import urlopen
 import re
 from bs4 import BeautifulSoup
-from urllib.request import urlopen
+
+
+def fetch_page_html(page_num):
+    """Fetch raw HTML for a given page number."""
+    url = f"https://www.thegradcafe.com/survey/?page={page_num}"
+    with urlopen(url) as page:
+        return page.read().decode("utf-8")
 
 
 def scrape_data(pages=1500):
-    all_data = []
+    """Scrape applicant data from multiple pages into a list of dicts."""
+    results = []
 
     for page_num in range(1, pages + 1):
+        soup = BeautifulSoup(fetch_page_html(page_num), "html.parser")
 
-        # Collect applicant data from each page
-        url = f"https://www.thegradcafe.com/survey/?page={page_num}"
+        # Collect all field lists in dictionaries
+        main = {
+            "universities": [d.get_text(strip=True) for d in soup.find_all(
+                "div", class_="tw-font-medium tw-text-gray-900 tw-text-sm")],
+            "programs": [],
+            "degree_types": [],
+            "comments": [],
+            "dates": [],
+            "statuses": [],
+            "urls": re.findall(r'https://www\.thegradcafe\.com/result/\d+\S*', str(soup))
+        }
 
-        # Open web page
-        page = urlopen(url)
-
-        # Extract the HTML from the page
-        html_bytes = page.read()
-        html = html_bytes.decode("utf-8")
-        soup = BeautifulSoup(html, 'html.parser')
-
-        # Find program name and degree type
-        program_html = soup.find_all("td", class_="tw-px-3 tw-py-5 tw-text-sm tw-text-gray-500")
-        programs =[]
-        degree_types = []
-
-        for td in program_html:
+        # Parse program/degree
+        for td in soup.find_all("td", class_="tw-px-3 tw-py-5 tw-text-sm tw-text-gray-500"):
             div = td.find("div", class_="tw-text-gray-900")
             if div:
                 spans = div.find_all("span")
-                if len(spans) > 0:
-                    programs.append(spans[0].get_text(strip=True))  # first span = program
-                else:
-                    programs.append("N/A")
-                if len(spans) > 1:
-                    degree_types.append(spans[1].get_text(strip=True))  # second span = degree type
-                else:
-                    degree_types.append("N/A")
+                main["programs"].append(spans[0].get_text(strip=True) if spans else "N/A")
+                main["degree_types"].append(
+                    spans[1].get_text(strip=True) if len(spans) > 1 else "N/A"
+                )
 
-        # Find university
-        university_html = soup.find_all('div',class_="tw-font-medium tw-text-gray-900 tw-text-sm")
-        universities = [i.get_text(strip=True) for i in university_html]
+        # Parse comments
+        for row in soup.find_all("tr"):
+            note = row.find("p", class_="tw-text-gray-500 tw-text-sm tw-my-0")
+            main["comments"].append(note.get_text(strip=True) if note else "N/A")
 
-        # Find comments
-        rows = soup.find_all("tr")
-        comments = []
-        for row in rows:
-            notes_html = row.find("p", class_="tw-text-gray-500 tw-text-sm tw-my-0")
-            if notes_html:
-                comments.append(notes_html.get_text(strip=True))
+        # Parse dates and statuses
+        for td in soup.find_all(
+            "td",
+            class_="tw-px-3 tw-py-5 tw-text-sm "
+                   "tw-text-gray-500 tw-whitespace-nowrap tw-hidden md:tw-table-cell"
+        ):
+            if td.find("div"):
+                main["statuses"].append(td.get_text(strip=True))
             else:
-                comments.append("N/A")
+                txt = td.get_text(strip=True)
+                if txt:
+                    main["dates"].append(txt)
 
-        # Find date added and applicant Status
-        date_html = soup.find_all('td',class_="tw-px-3 tw-py-5 tw-text-sm tw-text-gray-500 tw-whitespace-nowrap tw-hidden md:tw-table-cell")
-        dates_added = []
-        statuses = []
-        for td in date_html:
-            # Only keep if it has no <div> inside
-            if not td.find("div"):
-                text = td.get_text(strip=True)
-                if text:  # skip empty ones
-                    dates_added.append(text)
-            # If it has <div> inside, it's applicant status
-            else:
-                text = td.get_text(strip=True)
-                statuses.append(text)
-        
-        # Find applicant URLs
-        applicant_urls = re.findall(r'https://www\.thegradcafe\.com/result/\d+\S*', html)
+        # Parse extra fields with fewer branches
+        extras = {"gpa": [], "gre_g": [], "gre_v": [], "gre_aw": [], "semester": [], "intl": []}
+        PATTERNS = [
+            ("GRE V", "gre_v"),
+            ("GRE AW", "gre_aw"),
+            ("GRE ", "gre_g"),
+            ("GPA", "gpa"),
+        ]
 
-        # Find GRE, GPA, semester, international/US
-        gre_g_scores, gre_v_scores, gre_aw_scores, gpas, semesters, intl_flags = [], [], [], [], [], []
-        extra_html = soup.find_all("div", class_=re.compile(r"tw-inline-flex"))
+        for tag in soup.find_all("div", class_=re.compile(r"tw-inline-flex")):
+            txt = tag.get_text(strip=True)
 
-        for tag in extra_html:
-            text = tag.get_text(strip=True)
+            matched = False
+            for prefix, key in PATTERNS:
+                if txt.startswith(prefix):
+                    extras[key].append(txt.replace(prefix, "").strip())
+                    matched = True
+                    break
 
-            if text.startswith("GRE V"):
-                gre_v_scores.append(text.replace("GRE V", "").strip())
-            elif text.startswith("GRE AW"):
-                gre_aw_scores.append(text.replace("GRE AW", "").strip())
-            elif text.startswith("GRE "):
-                gre_g_scores.append(text.replace("GRE", "").strip())
-            elif text.startswith("GPA"):
-                gpas.append(text.replace("GPA", "").strip())
-            elif "Spring" in text or "Fall" in text or "Summer" in text:
-                semesters.append(text.strip())
-            elif text in ["International", "American"]:
-                intl_flags.append(text)
+            if not matched:
+                if any(season in txt for season in ("Spring", "Fall", "Summer")):
+                    extras["semester"].append(txt.strip())
+                elif txt in ("International", "American"):
+                    extras["intl"].append(txt)
 
-        # Stitch them together by index
-        for i in range(len(universities)):
-            all_data.append({
-                "university": universities[i],
-                "program": programs[i],
-                "degree_type": degree_types[i],
-                "comment": comments[i],
-                "date_added": dates_added[i],
-                "applicant_status": statuses[i],
-                "url": applicant_urls[i],
-                "gpa": gpas[i] if i < len(gpas) else "N/A",
-                "gre_general": gre_g_scores[i] if i < len(gre_g_scores) else "N/A",
-                "gre_verbal": gre_v_scores[i] if i < len(gre_v_scores) else "N/A",
-                "gre_aw": gre_aw_scores[i] if i < len(gre_aw_scores) else "N/A",
-                "semester_start": semesters[i] if i < len(semesters) else "N/A",
-                "international_status": intl_flags[i] if i < len(intl_flags) else "N/A",
+        # Stitch final records
+        for i, uni in enumerate(main["universities"]):
+            results.append({
+                "university": uni,
+                "program": main["programs"][i] if i < len(main["programs"]) else "N/A",
+                "degree_type": main["degree_types"][i] if i < len(main["degree_types"]) else "N/A",
+                "comment": main["comments"][i] if i < len(main["comments"]) else "N/A",
+                "date_added": main["dates"][i] if i < len(main["dates"]) else "N/A",
+                "applicant_status": main["statuses"][i] if i < len(main["statuses"]) else "N/A",
+                "url": main["urls"][i] if i < len(main["urls"]) else "N/A",
+                "gpa": extras["gpa"][i] if i < len(extras["gpa"]) else "N/A",
+                "gre_general": extras["gre_g"][i] if i < len(extras["gre_g"]) else "N/A",
+                "gre_verbal": extras["gre_v"][i] if i < len(extras["gre_v"]) else "N/A",
+                "gre_aw": extras["gre_aw"][i] if i < len(extras["gre_aw"]) else "N/A",
+                "semester_start": extras["semester"][i] if i < len(extras["semester"]) else "N/A",
+                "international_status": extras["intl"][i] if i < len(extras["intl"]) else "N/A",
             })
-    return all_data
+
+    return results
+
+if __name__ == "__main__":
+    scrape_data(5)
