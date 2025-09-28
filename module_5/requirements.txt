@@ -8,6 +8,6 @@ pytest-cov
 sphinx
 sphinx-rtd-theme
 
-graphviz          # required by pydeps for rendering graphs
+graphviz
 pylint
 pydeps
