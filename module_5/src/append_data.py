@@ -4,15 +4,16 @@ import json
 import psycopg
 from psycopg import Connection, Cursor, sql
 
+# pylint: disable=no-member
 
 def append_data(filename="llm_hosting/full_out.jsonl"):
     """Append new applicants into the database, skipping duplicates by URL."""
 
-    conn: Connection = psycopg.connect(
+    conn: Connection = psycopg.connect( # pylint: disable=no-member
         dbname="applicants",
         user="daniellechan",
     )
-    cur: Cursor = conn.cursor()
+    cur: Cursor = conn.cursor() # pylint: disable=no-member
 
     def clean_val(v):
         """Return None for empty/N/A values."""

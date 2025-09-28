@@ -1,6 +1,7 @@
 """Scrape GradCafe applicant data."""
 
 # pylint: disable=too-many-locals, too-many-branches, invalid-name
+# pylint: disable=no-member
 
 from urllib.request import urlopen
 import re

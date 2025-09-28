@@ -1,15 +1,18 @@
 """Query the applicants database and print summary statistics."""
 
-# pylint: disable=no-member
-
 import psycopg
+from psycopg import sql
 
 from src.sql_helpers import (
     SQL_COUNT_JHU_CS_MASTERS,
     SQL_COUNT_GEORGETOWN_CS_PHD_2025,
     SQL_COUNT_GRE_SUBMITTED,
+    build_avg_gpa_stmt,
+    build_ds_count_stmt,
 )
 
+
+# pylint: disable=no-member
 
 def get_connection():
     """Return a connection to the applicants database."""
@@ -19,30 +22,36 @@ def get_connection():
     )
 
 
+# ---------------------------
 # Individual report functions
+# ---------------------------
 
 def report_fall2025_applicants(cur):
     """Print the number of Fall 2025 applicants."""
-    cur.execute("""
+    stmt = sql.SQL("""
         SELECT COUNT(*)
-        FROM applicants
-        WHERE term ILIKE %s
-    """, ("%Fall 2025%",))
+        FROM {tbl}
+        WHERE term ILIKE {pattern}
+        LIMIT 1
+    """).format(tbl=sql.Identifier("applicants"), pattern=sql.Literal("%Fall 2025%"))
+    cur.execute(stmt)
     count = cur.fetchone()[0]
     print("Number of Fall 2025 applicants:", count)
 
 
 def report_international_percentage(cur):
     """Print the percentage of international applicants."""
-    cur.execute("""
+    stmt = sql.SQL("""
         SELECT ROUND(
-            100.0 * SUM(CASE WHEN us_or_international ILIKE '%International%' THEN 1 ELSE 0 END) / COUNT(*),
+            100.0 * SUM(CASE WHEN us_or_international ILIKE {intl} THEN 1 ELSE 0 END) / COUNT(*),
             2
         )
-        FROM applicants;
-    """)
+        FROM {tbl}
+        LIMIT 1
+    """).format(tbl=sql.Identifier("applicants"), intl=sql.Literal("%International%"))
+    cur.execute(stmt)
     pct = cur.fetchone()[0]
-    if pct:
+    if pct is not None:
         print(f"Percentage of international applicants: {pct:.2f}%")
     else:
         print("No applicants in the database.")
@@ -50,10 +59,12 @@ def report_international_percentage(cur):
 
 def report_average_scores(cur):
     """Print average GPA and GRE scores."""
-    cur.execute("""
+    stmt = sql.SQL("""
         SELECT AVG(gpa), AVG(gre), AVG(gre_v), AVG(gre_aw)
-        FROM applicants
-    """)
+        FROM {tbl}
+        LIMIT 1
+    """).format(tbl=sql.Identifier("applicants"))
+    cur.execute(stmt)
     avg_gpa, avg_gre, avg_gre_v, avg_gre_aw = cur.fetchone()
 
     print("Averages:")
@@ -65,15 +76,10 @@ def report_average_scores(cur):
 
 def report_avg_gpa_american_fall2025(cur):
     """Print average GPA of American applicants in Fall 2025."""
-    cur.execute("""
-        SELECT AVG(gpa)
-        FROM applicants
-        WHERE term = 'Fall 2025'
-          AND us_or_international = 'American'
-          AND gpa IS NOT NULL;
-    """)
+    stmt_avg_gpa_american = build_avg_gpa_stmt(term="Fall 2025", us_flag="American")
+    cur.execute(stmt_avg_gpa_american)
     avg_gpa = cur.fetchone()[0]
-    if avg_gpa:
+    if avg_gpa is not None:
         print(f"Average GPA of American applicants in Fall 2025: {avg_gpa:.2f}")
     else:
         print("No GPA data available for American applicants in Fall 2025.")
@@ -81,11 +87,17 @@ def report_avg_gpa_american_fall2025(cur):
 
 def report_acceptance_percentage_fall2025(cur):
     """Print acceptance percentage for Fall 2025 applicants."""
-    cur.execute("""
-        SELECT 100.0 * COUNT(*) FILTER (WHERE status ILIKE 'Accepted%') / COUNT(*)
-        FROM applicants
-        WHERE term = 'Fall 2025'
-    """)
+    stmt = sql.SQL("""
+        SELECT 100.0 * COUNT(*) FILTER (WHERE status ILIKE {acc}) / COUNT(*)
+        FROM {tbl}
+        WHERE term = {term}
+        LIMIT 1
+    """).format(
+        tbl=sql.Identifier("applicants"),
+        acc=sql.Literal("Accepted%"),
+        term=sql.Literal("Fall 2025"),
+    )
+    cur.execute(stmt)
     pct = cur.fetchone()[0]
     if pct is not None:
         print(f"Percentage of Fall 2025 entries that are Acceptances: {pct:.2f}%")
@@ -95,57 +107,47 @@ def report_acceptance_percentage_fall2025(cur):
 
 def report_avg_gpa_accepted_fall2025(cur):
     """Print average GPA of accepted Fall 2025 applicants."""
-    cur.execute("""
-        SELECT AVG(gpa)
-        FROM applicants
-        WHERE term = 'Fall 2025'
-          AND status ILIKE '%Accepted%'
-          AND gpa IS NOT NULL;
-    """)
-    avg = cur.fetchone()[0]
-    if avg:
-        print(f"Average GPA of accepted applicants for Fall 2025: {avg:.2f}")
+    stmt_avg_gpa_accepted = build_avg_gpa_stmt(term="Fall 2025", status="%Accepted%")
+    cur.execute(stmt_avg_gpa_accepted)
+    avg_gpa_acc = cur.fetchone()[0]
+    if avg_gpa_acc is not None:
+        print(f"Average GPA of accepted applicants for Fall 2025: {avg_gpa_acc:.2f}")
     else:
         print("No data available for accepted Fall 2025 applicants.")
 
 
 def report_jhu_cs_masters(cur):
     """Print number of applicants to JHU for a Master's in CS."""
-    cur.execute(SQL_COUNT_JHU_CS_MASTERS)
-
+    cur.execute(sql.SQL(SQL_COUNT_JHU_CS_MASTERS + " LIMIT 1"))
     count = cur.fetchone()[0]
     print(f"Number of applicants to JHU for a Master's in Computer Science: {count}")
 
 
 def report_georgetown_cs_phd_acceptances(cur):
     """Print number of 2025 Georgetown PhD CS acceptances."""
-    cur.execute(SQL_COUNT_GEORGETOWN_CS_PHD_2025)
-
+    cur.execute(sql.SQL(SQL_COUNT_GEORGETOWN_CS_PHD_2025 + " LIMIT 1"))
     count = cur.fetchone()[0]
     print(f"Number of 2025 Georgetown PhD Computer Science acceptances: {count}")
 
 
 def report_datascience_fall2025(cur):
     """Print number of Fall 2025 Data Science applicants."""
-    cur.execute("""
-        SELECT COUNT(*)
-        FROM applicants
-        WHERE term ILIKE '%Fall 2025%'
-          AND llm_generated_program ILIKE '%Data Science%';
-    """)
-    count = cur.fetchone()[0]
-    print(f"Number of Fall 2025 Data Science applicants: {count}")
+    stmt_ds = build_ds_count_stmt(term="%Fall 2025%", program_pattern="%Data Science%")
+    cur.execute(stmt_ds)
+    ds_apps = cur.fetchone()[0]
+    print(f"Number of Fall 2025 Data Science applicants: {ds_apps}")
 
 
 def report_gre_submitters(cur):
     """Print number of applicants who submitted any GRE score."""
-    cur.execute(SQL_COUNT_GRE_SUBMITTED)
-
+    cur.execute(sql.SQL(SQL_COUNT_GRE_SUBMITTED + " LIMIT 1"))
     count = cur.fetchone()[0]
     print(f"Number of applicants who submitted a GRE score: {count}")
 
 
+# ---------------------------
 # Main runner
+# ---------------------------
 
 def main():
     """Run all reports in sequence."""
