@@ -1,20 +1,26 @@
+"""Tests for analysis formatting in the Flask application."""
+
+import sys
+import os
 import re
+
+# Third-party imports
 import pytest
 from bs4 import BeautifulSoup
-import sys, os
 
 # Ensure src is on sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from run import app
+from run import app  # pylint: disable=import-error,wrong-import-position
 
 @pytest.fixture
 def example_client():
+    """Return a Flask test client."""
     return app.test_client()
 
 
 @pytest.mark.analysis
-def test_answer_labels_present(example_client):
+def test_answer_labels_present(example_client): # pylint: disable=redefined-outer-name
     """Check that 'Answer:' labels appear in the rendered analysis page"""
     response = example_client.get("/")
     assert response.status_code == 200
@@ -22,9 +28,10 @@ def test_answer_labels_present(example_client):
 
     # Look for "Answer:" at least once
     assert "Answer:" in html, "Expected 'Answer:' label not found in page"
-    
+
+
 @pytest.mark.analysis
-def test_percentage_formatting(example_client):
+def test_percentage_formatting(example_client): # pylint: disable=redefined-outer-name
     """Check that percentages are formatted to two decimal places"""
     response = example_client.get("/")
     assert response.status_code == 200
