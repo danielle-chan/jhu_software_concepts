@@ -1,19 +1,24 @@
-import json
-import sys, os, json
+"""Tests for cleaning, saving, and loading applicant data."""
+
+import sys
+import os
 import pytest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from clean import clean_data, save_data, load_data
+from clean import clean_data, save_data, load_data # pylint: disable=wrong-import-position, import-error
+
 
 @pytest.mark.clean
 def test_clean_data_normalizes_missing_fields():
+    """Check that missing fields are normalized to 'N/A'."""
     raw = [{"university": "Test U"}]  # leave "program" key out completely
     cleaned = clean_data(raw)
     assert cleaned[0]["program"] == "N/A"
 
 @pytest.mark.clean
 def test_save_and_load_roundtrip(tmp_path):
+    """Check that saving and loading data preserves the data."""
     cleaned = [{"university": "U", "program": "CS"}]
     file = tmp_path / "test.json"
     save_data(cleaned, file)
@@ -22,5 +27,6 @@ def test_save_and_load_roundtrip(tmp_path):
 
 @pytest.mark.clean
 def test_clean_data_handles_empty_list():
+    """Check that cleaning an empty list returns an empty list."""
     cleaned = clean_data([])
     assert cleaned == []  # should just return empty without errors
