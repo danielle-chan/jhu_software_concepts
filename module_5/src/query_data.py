@@ -4,6 +4,12 @@
 
 import psycopg
 
+from src.sql_helpers import (
+    SQL_COUNT_JHU_CS_MASTERS,
+    SQL_COUNT_GEORGETOWN_CS_PHD_2025,
+    SQL_COUNT_GRE_SUBMITTED,
+)
+
 
 def get_connection():
     """Return a connection to the applicants database."""
@@ -105,41 +111,16 @@ def report_avg_gpa_accepted_fall2025(cur):
 
 def report_jhu_cs_masters(cur):
     """Print number of applicants to JHU for a Master's in CS."""
-    cur.execute("""
-        SELECT COUNT(*)
-        FROM applicants
-        WHERE (
-            llm_generated_university ILIKE '%Johns Hopkins%'
-            OR llm_generated_university ILIKE '%JHU%'
-            OR llm_generated_university ILIKE '%Hopkins%'
-        )
-          AND llm_generated_program ILIKE '%Computer Science%'
-          AND (
-              degree ILIKE '%Master%'
-              OR degree ILIKE '%MS%'
-              OR degree ILIKE '%M.S.%'
-              OR degree ILIKE '%Masters%'
-          );
-    """)
+    cur.execute(SQL_COUNT_JHU_CS_MASTERS)
+
     count = cur.fetchone()[0]
     print(f"Number of applicants to JHU for a Master's in Computer Science: {count}")
 
 
 def report_georgetown_cs_phd_acceptances(cur):
     """Print number of 2025 Georgetown PhD CS acceptances."""
-    cur.execute("""
-        SELECT COUNT(*)
-        FROM applicants
-        WHERE term ILIKE '%2025%'
-          AND status ILIKE '%Accept%'
-          AND llm_generated_university ILIKE '%Georgetown%'
-          AND (
-              degree ILIKE '%PhD%'
-              OR degree ILIKE '%Ph.D.%'
-              OR degree ILIKE '%Doctorate%'
-          )
-          AND llm_generated_program ILIKE '%Computer Science%';
-    """)
+    cur.execute(SQL_COUNT_GEORGETOWN_CS_PHD_2025)
+
     count = cur.fetchone()[0]
     print(f"Number of 2025 Georgetown PhD Computer Science acceptances: {count}")
 
@@ -158,13 +139,8 @@ def report_datascience_fall2025(cur):
 
 def report_gre_submitters(cur):
     """Print number of applicants who submitted any GRE score."""
-    cur.execute("""
-        SELECT COUNT(*)
-        FROM applicants
-        WHERE gre IS NOT NULL
-           OR gre_v IS NOT NULL
-           OR gre_aw IS NOT NULL;
-    """)
+    cur.execute(SQL_COUNT_GRE_SUBMITTED)
+
     count = cur.fetchone()[0]
     print(f"Number of applicants who submitted a GRE score: {count}")
 
