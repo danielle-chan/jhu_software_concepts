@@ -1,22 +1,32 @@
+"""Tests for inserting applicants into the database."""
+
+# pylint: disable=redefined-outer-name
+
 import psycopg
 import pytest
 
+
 @pytest.fixture
-def db_connection():
+def db_conn_fixture():
+    """Provide a temporary DB connection for tests, rolling back after use."""
     conn = psycopg.connect(
         dbname="applicants",
         user="daniellechan",
     )
     yield conn
-    conn.rollback()  # rollback test changes so DB stays clean
-    conn.close()
+    conn.rollback()  # pylint: disable=no-member
+    conn.close()     # pylint: disable=no-member
+
 
 @pytest.mark.db
-def test_insert_and_select(db_connection):
-    cur = db_connection.cursor()
+def test_insert_and_select(db_conn_fixture):
+    """Verify that inserting a new applicant works and can be queried."""
+    cur = db_conn_fixture.cursor()
 
-    # Insert a fake applicant row
-    cur.execute("""
+    test_url = "http://test-unique-url.com"
+
+    cur.execute(
+        """
         INSERT INTO applicants (
             program, degree, comments, date_added, status, url,
             gpa, gre, gre_v, gre_aw, term, us_or_international,
@@ -27,60 +37,67 @@ def test_insert_and_select(db_connection):
             %s, %s, %s
         )
         ON CONFLICT (url) DO NOTHING
-    """, (
-        "Computer Science",
-        "Masters",
-        "Test comment",
-        "2025-01-01",
-        "Accepted",
-        "http://test-unique-url.com",
-        3.8, 320, 160, 4.5,
-        "Fall 2025",
-        "American",
-        "Computer Science",
-        "Test University",
-        "Test University"
-    ))
+        """,
+        (
+            "Computer Science",
+            "Masters",
+            "Test comment",
+            "2025-01-01",
+            "Accepted",
+            test_url,
+            3.8, 320, 160, 4.5,
+            "Fall 2025",
+            "American",
+            "Computer Science",
+            "Test University",
+            "Test University",
+        ),
+    )
 
-    # Check that it got inserted
-    cur.execute("SELECT * FROM applicants WHERE url = %s", ("http://test-unique-url.com",))
+    cur.execute("SELECT * FROM applicants WHERE url = %s", (test_url,))
     row = cur.fetchone()
     assert row is not None, "Row was not inserted into applicants table"
 
+
 @pytest.mark.db
-def test_duplicate_insert_is_ignored(db_connection):
-    cur = db_connection.cursor()
+def test_duplicate_insert_is_ignored(db_conn_fixture):
+    """Verify that duplicate inserts using the same URL are ignored."""
+    cur = db_conn_fixture.cursor()
+
     url = "http://test-duplicate-url.com"
 
-    # Insert once
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO applicants (program, degree, comments, date_added, status, url)
         VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT (url) DO NOTHING
-    """, (
-        "Data Science",
-        "PhD",
-        "Initial comment",
-        "2025-01-02",
-        "Rejected",
-        url
-    ))
+        """,
+        (
+            "Data Science",
+            "PhD",
+            "Initial comment",
+            "2025-01-02",
+            "Rejected",
+            url,
+        ),
+    )
 
-    # Insert duplicate with different comment
-    cur.execute("""
+    cur.execute(
+        """
         INSERT INTO applicants (program, degree, comments, date_added, status, url)
         VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT (url) DO NOTHING
-    """, (
-        "Data Science",
-        "PhD",
-        "Duplicate comment should be ignored",
-        "2025-01-02",
-        "Rejected",
-        url
-    ))
+        """,
+        (
+            "Data Science",
+            "PhD",
+            "Duplicate comment should be ignored",
+            "2025-01-02",
+            "Rejected",
+            url,
+        ),
+    )
 
-    # Should still only have 1 row
     cur.execute("SELECT COUNT(*) FROM applicants WHERE url = %s", (url,))
     count = cur.fetchone()[0]
     assert count == 1, f"Expected 1 row for {url}, but found {count}"
