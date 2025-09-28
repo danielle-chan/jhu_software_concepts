@@ -1,19 +1,26 @@
-import sys, os, json
+"""Integration test for the full end-to-end workflow."""
+
+import sys
+import os
+import json
 import pytest
 
+# Ensure src is on sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-import run
-import append_data
+
+import run  # pylint: disable=wrong-import-position, import-error
+import append_data  # pylint: disable=wrong-import-position, import-error
 
 
-@pytest.fixture
-def example_client():
+@pytest.fixture(name="example_client")
+def example_client_fixture():
+    """Provide a Flask test client."""
     return run.app.test_client()
 
 
 @pytest.mark.integration
 def test_end_to_end_flow(example_client, monkeypatch, tmp_path):
-    """Simulate scraper -> append -> update -> render"""
+    """Simulate scraper → append → update → render."""
 
     # Step 1: Fake applicant data
     fake_data = [{
@@ -36,13 +43,14 @@ def test_end_to_end_flow(example_client, monkeypatch, tmp_path):
 
     # Step 2: Write fake JSONL file
     jsonl_file = tmp_path / "fake_full_out.jsonl"
-    with open(jsonl_file, "w") as f:
+    with open(jsonl_file, "w", encoding="utf-8") as f:
         for entry in fake_data:
             f.write(json.dumps(entry) + "\n")
 
     # Step 3: Patch subprocess.run (skip scraping) and append_data (use fake file)
     monkeypatch.setattr("subprocess.run", lambda *a, **k: None)
-    monkeypatch.setattr("run.append_data", lambda fn=None: append_data.append_data(str(jsonl_file)))
+    monkeypatch.setattr("run.append_data",
+                        lambda fn=None: append_data.append_data(str(jsonl_file)))
 
     # Step 4: Call /pull_data (should load fake row)
     response = example_client.get("/pull_data", follow_redirects=True)
