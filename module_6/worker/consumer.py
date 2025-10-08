@@ -1,47 +1,49 @@
-import os, json, time, sys, subprocess
-import pika
+import os, json, time, sys, subprocess, pika
 
-RABBIT_HOST = os.getenv("RABBIT_HOST", "rabbitmq")
-RABBIT_PORT = int(os.getenv("RABBIT_PORT", "5672"))
-RABBIT_USER = os.getenv("RABBIT_USER", "guest")
-RABBIT_PASS = os.getenv("RABBIT_PASS", "guest")
-ETL_EXCHANGE = os.getenv("ETL_EXCHANGE", "etl")
-ETL_QUEUE = os.getenv("ETL_QUEUE", "ingest")
-ETL_ROUTING_KEY = os.getenv("ETL_ROUTING_KEY", "ingest")
+EXCHANGE = "tasks"
+QUEUE = "tasks_q"
+ROUTING_KEY = "tasks"
 
-def load_data():
-    """
-    Run your DB loader. This assumes docker-compose mounts ./db -> /app/db:ro.
-    If load_data.py has a main guard, this will execute it.
-    """
-    # If your loader is a module with a callable, you could import and call it.
-    # Using a subprocess keeps it simple and decoupled.
-    subprocess.check_call([sys.executable, "/app/db/load_data.py"])
-
-def main():
-    creds = pika.PlainCredentials(RABBIT_USER, RABBIT_PASS)
-    params = pika.ConnectionParameters(host=RABBIT_HOST, port=RABBIT_PORT, credentials=creds)
+def _open_channel():
+    url = os.getenv("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/%2F")
+    params = pika.URLParameters(url)
     conn = pika.BlockingConnection(params)
     ch = conn.channel()
-
-    ch.exchange_declare(exchange=ETL_EXCHANGE, exchange_type="direct", durable=True)
-    ch.queue_declare(queue=ETL_QUEUE, durable=True)
-    ch.queue_bind(queue=ETL_QUEUE, exchange=ETL_EXCHANGE, routing_key=ETL_ROUTING_KEY)
+    ch.exchange_declare(exchange=EXCHANGE, exchange_type="direct", durable=True)
+    ch.queue_declare(queue=QUEUE, durable=True)
+    ch.queue_bind(exchange=EXCHANGE, queue=QUEUE, routing_key=ROUTING_KEY)
     ch.basic_qos(prefetch_count=1)
+    print("worker connected & consuming...", flush=True)
+    return conn, ch
 
-    def handle(ch_, method, props, body):
-        try:
-            # optional: inspect payload
-            _ = json.loads(body.decode("utf-8")) if body else {}
-            load_data()
-            ch_.basic_ack(delivery_tag=method.delivery_tag)
-        except Exception:
-            # nack + requeue
-            ch_.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
-            time.sleep(1)
+def _load_data():
+    # Run your DB loader (mounted at /app/db)
+    subprocess.check_call([sys.executable, "/app/db/load_data.py"])
 
-    ch.basic_consume(queue=ETL_QUEUE, on_message_callback=handle, auto_ack=False)
-    ch.start_consuming()
+def _handle(ch_, method, props, body):
+    try:
+        msg = json.loads(body.decode("utf-8")) if body else {}
+        kind = msg.get("kind")
+        print(f"got: {msg}", flush=True)
+
+        if kind in ("scrape_new_data", "recompute_analytics"):
+            _load_data()   # stub: replace with incremental logic later
+        else:
+            print(f"unknown kind: {kind}", flush=True)
+
+        ch_.basic_ack(delivery_tag=method.delivery_tag)
+    except Exception as e:  # keep message; retry later
+        print(f"handler error: {e}", flush=True)
+        ch_.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+        time.sleep(1)
+
+def main():
+    conn, ch = _open_channel()
+    ch.basic_consume(queue=QUEUE, on_message_callback=_handle, auto_ack=False)
+    try:
+        ch.start_consuming()
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     main()

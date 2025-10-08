@@ -6,6 +6,17 @@ import psycopg
 from psycopg import sql
 import re
 
+DEFAULT_FILE = "/app/data/full_out.jsonl"
+
+def _iter_records(file_path):
+    # JSONL: one JSON object per line
+    with open(file_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                yield json.loads(line)
+
+
 def to_float(v):
     """Return a float or None from messy numeric strings like '3.9', '320', '160/170', '4.5 (AW)', 'N/A'."""
     if v in (None, "", "N/A"):

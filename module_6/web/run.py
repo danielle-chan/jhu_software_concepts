@@ -2,10 +2,10 @@
 
 import os
 
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, make_response
 import psycopg
 from psycopg import sql
-from publisher import publish
+from publisher import publish_task 
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -208,17 +208,33 @@ def index():
         count_gre=count_gre,
     )
 
-@app.route("/pull_data")
+# Publish a "scrape_new_data" task and return HTTP 202
+@app.route("/pull_data", methods=["GET", "POST"])
 def pull_data():
-    publish({"action": "ingest"})
-    flash("ETL job published.")
-    return redirect(url_for("index"))
+    try:
+        publish_task("scrape_new_data", {"source": "gradcafe"})
+        flash("Request queued: scrape_new_data")
+        resp = make_response(redirect(url_for("index")))
+        resp.status_code = 202
+        return resp
+    except Exception as e:  # pylint: disable=broad-except
+        app.logger.exception("Failed to publish pull_data task: %s", e)
+        flash(f"Failed to queue task: {e}")
+        return make_response(redirect(url_for("index")), 503)
 
-@app.route("/update_analysis")
+# Publish a "recompute_analytics" task and return HTTP 202
+@app.route("/update_analysis", methods=["GET", "POST"])
 def update_analysis():
-    flash("Analysis updated with the latest data.")
-    return redirect(url_for("index"))
+    try:
+        publish_task("recompute_analytics")
+        flash("Request queued: recompute_analytics")
+        resp = make_response(redirect(url_for("index")))
+        resp.status_code = 202
+        return resp
+    except Exception as e:  # pylint: disable=broad-except
+        app.logger.exception("Failed to publish update_analysis task: %s", e)
+        flash(f"Failed to queue task: {e}")
+        return make_response(redirect(url_for("index")), 503)
 
 if __name__ == "__main__":
-    # Bind to 0.0.0.0:8080 for Docker
     app.run(host="0.0.0.0", port=8080, debug=False)
