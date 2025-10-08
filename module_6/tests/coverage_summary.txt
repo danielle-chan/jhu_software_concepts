@@ -1,0 +1,13 @@
+
+Name                 Stmts   Miss  Cover   Missing
+--------------------------------------------------
+src/__init__.py          0      0   100%
+src/append_data.py      14      0   100%
+src/clean.py            35      6    83%   68-75
+src/constraint.py       11      1    91%   19
+src/load_data.py        14      0   100%
+src/query_data.py       43      2    95%   65, 81
+src/run.py              54      1    98%   217
+src/scrape.py           63     16    75%   34, 38, 52, 77-90
+--------------------------------------------------
+TOTAL                  234     26    89%

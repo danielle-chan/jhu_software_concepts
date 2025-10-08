@@ -1,116 +1,196 @@
-"""Main Flask application for the GradCafe ETL dashboard."""
+"""Flask web app (read-only): shows GradCafe ETL statistics."""
 
-import subprocess
+import os
+
+from flask import Flask, render_template, redirect, url_for, flash
 import psycopg
 from psycopg import sql
-from flask import Flask, render_template, redirect, url_for, flash
-
-from src.append_data import append_data
-from worker.etl.sql_helpers import (
-    SQL_COUNT_JHU_CS_MASTERS,
-    SQL_COUNT_GEORGETOWN_CS_PHD_2025,
-    SQL_COUNT_GRE_SUBMITTED,
-    build_avg_gpa_stmt,
-    build_ds_count_stmt,
-)
-
-# pylint: disable=no-member
-# pylint: disable=too-many-locals   # Acceptable becayse index() route needs many values for the template
-
-IS_RUNNING = False  # global flag to block simultaneous updates
+from publisher import publish
 
 app = Flask(__name__)
-app.secret_key = "secret_key"  # Needed for flash messages
+app.secret_key = "secret_key"
+
+DB_NAME = os.getenv("POSTGRES_DB", "applicants")
+DB_USER = os.getenv("POSTGRES_USER", "postgres")
+DB_PASS = os.getenv("POSTGRES_PASSWORD", "postgres")
+DB_HOST = os.getenv("POSTGRES_HOST", "db")
+DB_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
 
 
-def get_db_connection():
-    """Create and return a connection to the applicants database."""
+def get_conn():
     return psycopg.connect(
-        dbname="applicants",
-        user="daniellechan",
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASS,
+        host=DB_HOST,
+        port=DB_PORT,
     )
-
 
 @app.route("/")
 def index():
-    """Render the dashboard with all current statistics."""
-    conn = get_db_connection()
-    cur = conn.cursor()
+    """Render dashboard metrics."""
+    # Using context managers ensures clean close; also plays nicely with linters.
+    with get_conn() as conn, conn.cursor() as cur:
 
-    # 1. How many applied for Fall 2025
-    stmt_fall2025 = sql.SQL("""
-        SELECT COUNT(*)
-        FROM {tbl}
-        WHERE term ILIKE {pattern}
-        LIMIT 1
-    """).format(tbl=sql.Identifier("applicants"), pattern=sql.Literal("%Fall 2025%"))
-    cur.execute(stmt_fall2025)
-    count = cur.fetchone()[0]
+        # 1) How many applied for Fall 2025
+        stmt_fall2025 = sql.SQL("""
+            SELECT COUNT(*)
+            FROM {tbl}
+            WHERE term ILIKE {pattern}
+            LIMIT 1
+        """).format(tbl=sql.Identifier("applicants"),
+                    pattern=sql.Literal("%Fall 2025%"))
+        cur.execute(stmt_fall2025)
+        count = cur.fetchone()[0]
 
-    # 2. Percent of international students
-    stmt_international = sql.SQL("""
-        SELECT ROUND(
-            100.0 * SUM(CASE WHEN us_or_international ILIKE {intl} THEN 1 ELSE 0 END) / COUNT(*), 2
+        # 2) Percent of international students
+        stmt_pct_intl = sql.SQL("""
+            SELECT ROUND(
+                100.0 * SUM(CASE WHEN us_or_international ILIKE {intl} THEN 1 ELSE 0 END) / NULLIF(COUNT(*), 0),
+                2
+            )
+            FROM {tbl}
+            LIMIT 1
+        """).format(tbl=sql.Identifier("applicants"),
+                    intl=sql.Literal("%International%"))
+        cur.execute(stmt_pct_intl)
+        percent_international = cur.fetchone()[0]
+
+        # 3) Average GPA and GRE scores
+        stmt_avgs = sql.SQL("""
+            SELECT AVG(gpa), AVG(gre), AVG(gre_v), AVG(gre_aw)
+            FROM {tbl}
+            LIMIT 1
+        """).format(tbl=sql.Identifier("applicants"))
+        cur.execute(stmt_avgs)
+        avg_gpa, avg_gre, avg_gre_v, avg_gre_aw = cur.fetchone()
+
+        # 4) Average GPA of American students (Fall 2025)
+        stmt_avg_gpa_american = sql.SQL("""
+            SELECT AVG(gpa)
+            FROM {tbl}
+            WHERE term = {term}
+              AND us_or_international = {flag}
+              AND gpa IS NOT NULL
+            LIMIT 1
+        """).format(tbl=sql.Identifier("applicants"),
+                    term=sql.Literal("Fall 2025"),
+                    flag=sql.Literal("American"))
+        cur.execute(stmt_avg_gpa_american)
+        avg_gpa_american = cur.fetchone()[0]
+
+        # 5) Percent acceptances for Fall 2025
+        stmt_pct_accept = sql.SQL("""
+            SELECT 100.0 * COUNT(*) FILTER (WHERE status ILIKE {acc}) / NULLIF(COUNT(*), 0)
+            FROM {tbl}
+            WHERE term = {term}
+            LIMIT 1
+        """).format(tbl=sql.Identifier("applicants"),
+                    acc=sql.Literal("Accepted%"),
+                    term=sql.Literal("Fall 2025"))
+        cur.execute(stmt_pct_accept)
+        percent_acceptances = cur.fetchone()[0]
+
+        # 6) Average GPA of acceptances (Fall 2025)
+        stmt_avg_gpa_accepted = sql.SQL("""
+            SELECT AVG(gpa)
+            FROM {tbl}
+            WHERE term = {term}
+              AND status ILIKE {acc}
+              AND gpa IS NOT NULL
+            LIMIT 1
+        """).format(tbl=sql.Identifier("applicants"),
+                    term=sql.Literal("Fall 2025"),
+                    acc=sql.Literal("%Accepted%"))
+        cur.execute(stmt_avg_gpa_accepted)
+        avg_gpa_accepted = cur.fetchone()[0]
+
+        # 7) Applicants to JHU for a Master’s in CS
+        stmt_jhu_ms_cs = sql.SQL("""
+            SELECT COUNT(*)
+            FROM {tbl}
+            WHERE (
+                llm_generated_university ILIKE {u1}
+                OR llm_generated_university ILIKE {u2}
+                OR llm_generated_university ILIKE {u3}
+            )
+            AND llm_generated_program ILIKE {prog_cs}
+            AND (
+                degree ILIKE {m1}
+                OR degree ILIKE {m2}
+                OR degree ILIKE {m3}
+                OR degree ILIKE {m4}
+            )
+            LIMIT 1
+        """).format(
+            tbl=sql.Identifier("applicants"),
+            u1=sql.Literal("%Johns Hopkins%"),
+            u2=sql.Literal("%JHU%"),
+            u3=sql.Literal("%Hopkins%"),
+            prog_cs=sql.Literal("%Computer Science%"),
+            m1=sql.Literal("%Master%"),
+            m2=sql.Literal("%MS%"),
+            m3=sql.Literal("%M.S.%"),
+            m4=sql.Literal("%Masters%"),
         )
-        FROM {tbl}
-        LIMIT 1
-    """).format(tbl=sql.Identifier("applicants"), intl=sql.Literal("%International%"))
-    cur.execute(stmt_international)
-    percent_international = cur.fetchone()[0]
+        cur.execute(stmt_jhu_ms_cs)
+        jhu_apps = cur.fetchone()[0]
 
-    # 3. Average GPA and GRE scores
-    stmt_avg_scores = sql.SQL("""
-        SELECT AVG(gpa), AVG(gre), AVG(gre_v), AVG(gre_aw)
-        FROM {tbl}
-        LIMIT 1
-    """).format(tbl=sql.Identifier("applicants"))
-    cur.execute(stmt_avg_scores)
-    avg_gpa, avg_gre, avg_gre_v, avg_gre_aw = cur.fetchone()
+        # 8) 2025 Georgetown PhD CS acceptances
+        stmt_gtown_phd_cs_2025 = sql.SQL("""
+            SELECT COUNT(*)
+            FROM {tbl}
+            WHERE term ILIKE {y2025}
+              AND status ILIKE {accept}
+              AND llm_generated_university ILIKE {gtown}
+              AND (
+                  degree ILIKE {phd1}
+                  OR degree ILIKE {phd2}
+                  OR degree ILIKE {phd3}
+              )
+              AND llm_generated_program ILIKE {prog_cs}
+            LIMIT 1
+        """).format(
+            tbl=sql.Identifier("applicants"),
+            y2025=sql.Literal("%2025%"),
+            accept=sql.Literal("%Accept%"),
+            gtown=sql.Literal("%Georgetown%"),
+            phd1=sql.Literal("%PhD%"),
+            phd2=sql.Literal("%Ph.D.%"),
+            phd3=sql.Literal("%Doctorate%"),
+            prog_cs=sql.Literal("%Computer Science%"),
+        )
+        cur.execute(stmt_gtown_phd_cs_2025)
+        gtown_apps = cur.fetchone()[0]
 
-    # 4. Average GPA of American students (centralized)
-    stmt_avg_gpa_american = build_avg_gpa_stmt(term="Fall 2025", us_flag="American")
-    cur.execute(stmt_avg_gpa_american)
-    avg_gpa_american = cur.fetchone()[0]
+        # 9) Fall 2025 Data Science applicants
+        stmt_ds = sql.SQL("""
+            SELECT COUNT(*)
+            FROM {tbl}
+            WHERE term ILIKE {term}
+              AND llm_generated_program ILIKE {prog}
+            LIMIT 1
+        """).format(
+            tbl=sql.Identifier("applicants"),
+            term=sql.Literal("%Fall 2025%"),
+            prog=sql.Literal("%Data Science%")
+        )
+        cur.execute(stmt_ds)
+        ds_apps = cur.fetchone()[0]
 
-    # 5. Percent acceptances for Fall 2025
-    stmt_acceptances = sql.SQL("""
-        SELECT 100.0 * COUNT(*) FILTER (WHERE status ILIKE {acc}) / COUNT(*)
-        FROM {tbl}
-        WHERE term = {term}
-        LIMIT 1
-    """).format(
-        tbl=sql.Identifier("applicants"),
-        acc=sql.Literal("Accepted%"),
-        term=sql.Literal("Fall 2025"),
-    )
-    cur.execute(stmt_acceptances)
-    percent_acceptances = cur.fetchone()[0]
+        # 10) Number of applicants who submitted any GRE score
+        stmt_gre_submitters = sql.SQL("""
+            SELECT COUNT(*)
+            FROM {tbl}
+            WHERE gre IS NOT NULL
+               OR gre_v IS NOT NULL
+               OR gre_aw IS NOT NULL
+            LIMIT 1
+        """).format(tbl=sql.Identifier("applicants"))
+        cur.execute(stmt_gre_submitters)
+        count_gre = cur.fetchone()[0]
 
-    # 6. Average GPA of acceptances from Fall 2025
-    stmt_avg_gpa_accepted = build_avg_gpa_stmt(term="Fall 2025", status="%Accepted%")
-    cur.execute(stmt_avg_gpa_accepted)
-    avg_gpa_accepted = cur.fetchone()[0]
-
-    # 7. Applicants who applied to JHU for master's in CS
-    cur.execute(sql.SQL(SQL_COUNT_JHU_CS_MASTERS + " LIMIT 1"))
-    jhu_apps = cur.fetchone()[0]
-
-    # 8. 2025 applicants who applied to Georgetown for PhD in CS
-    cur.execute(sql.SQL(SQL_COUNT_GEORGETOWN_CS_PHD_2025 + " LIMIT 1"))
-    gtown_apps = cur.fetchone()[0]
-
-    # 9. Fall 2025 Data Science applicants
-    stmt_ds = build_ds_count_stmt(term="%Fall 2025%", program_pattern="%Data Science%")
-    cur.execute(stmt_ds)
-    ds_apps = cur.fetchone()[0]
-
-    # 10. Number of applicants who submitted a GRE score
-    cur.execute(sql.SQL(SQL_COUNT_GRE_SUBMITTED + " LIMIT 1"))
-    count_gre = cur.fetchone()[0]
-
-    cur.close()
-    conn.close()
-
+    # Render your existing template (place it at module_6/web/templates/index.html)
     return render_template(
         "index.html",
         count=count,
@@ -128,32 +208,17 @@ def index():
         count_gre=count_gre,
     )
 
-
 @app.route("/pull_data")
 def pull_data():
-    """Scrape, clean, standardize, and append new data."""
-    subprocess.run(["python3", "scrape.py"], check=True)
-    subprocess.run(["python3", "clean.py"], check=True)
-    subprocess.run([
-        "python3", "llm_hosting/app.py",
-        "--file", "cleaned_applicant_data.json",
-        "--out", "llm_hosting/full_out.jsonl",
-    ], check=True)
-
-    append_data("llm_hosting/full_out.jsonl")
+    publish({"action": "ingest"})
+    flash("ETL job published.")
     return redirect(url_for("index"))
-
 
 @app.route("/update_analysis")
 def update_analysis():
-    """Trigger a refresh of analysis unless a pull is running."""
-    if IS_RUNNING:
-        flash("Please wait. Cannot update analysis while a data pull is running.")
-        return redirect(url_for("index"))
-
     flash("Analysis updated with the latest data.")
     return redirect(url_for("index"))
 
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    # Bind to 0.0.0.0:8080 for Docker
+    app.run(host="0.0.0.0", port=8080, debug=False)

@@ -1,37 +1,25 @@
-# module_6/web/publisher.py
-import os
-import pika
+import os, json, pika
 
-def get_conn_params():
-    return pika.ConnectionParameters(
-        host=os.environ.get("RABBITMQ_HOST", "localhost"),
-        port=int(os.environ.get("RABBITMQ_PORT", "5672")),
-        credentials=pika.PlainCredentials(
-            os.environ.get("RABBITMQ_USER", "guest"),
-            os.environ.get("RABBITMQ_PASSWORD", "guest"),
-        ),
-        heartbeat=30
+EXCHANGE = os.getenv("ETL_EXCHANGE", "etl")
+QUEUE = os.getenv("ETL_QUEUE", "ingest")
+ROUTING_KEY = os.getenv("ETL_ROUTING_KEY", "ingest")
+
+def publish(payload: dict) -> None:
+    creds = pika.PlainCredentials(os.getenv("RABBIT_USER","guest"), os.getenv("RABBIT_PASS","guest"))
+    params = pika.ConnectionParameters(
+        host=os.getenv("RABBIT_HOST","rabbitmq"),
+        port=int(os.getenv("RABBIT_PORT","5672")),
+        credentials=creds,
     )
-
-def publish_message(payload: bytes):
-    exchange = os.environ.get("RABBITMQ_EXCHANGE", "gradcafe_events")
-    queue = os.environ.get("RABBITMQ_QUEUE", "gradcafe_jobs")
-    routing_key = os.environ.get("RABBITMQ_ROUTING_KEY", "etl.job")
-
-    connection = pika.BlockingConnection(get_conn_params())
-    channel = connection.channel()
-
-    # Durable exchange & queue
-    channel.exchange_declare(exchange=exchange, exchange_type="direct", durable=True)
-    channel.queue_declare(queue=queue, durable=True)
-    channel.queue_bind(queue=queue, exchange=exchange, routing_key=routing_key)
-
-    # delivery_mode=2 makes the message persistent
-    channel.basic_publish(
-        exchange=exchange,
-        routing_key=routing_key,
-        body=payload,
-        properties=pika.BasicProperties(delivery_mode=2),
-        mandatory=True
+    conn = pika.BlockingConnection(params)
+    ch = conn.channel()
+    ch.exchange_declare(exchange=EXCHANGE, exchange_type="direct", durable=True)
+    ch.queue_declare(queue=QUEUE, durable=True)
+    ch.queue_bind(queue=QUEUE, exchange=EXCHANGE, routing_key=ROUTING_KEY)
+    ch.basic_publish(
+        exchange=EXCHANGE,
+        routing_key=ROUTING_KEY,
+        body=json.dumps(payload).encode("utf-8"),
+        properties=pika.BasicProperties(delivery_mode=2),  # persistent
     )
-    connection.close()
+    conn.close()

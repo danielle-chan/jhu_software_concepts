@@ -1,0 +1,129 @@
+************* Module test_scrape
+tests/test_scrape.py:1:0: R0801: Similar lines in 2 files
+==test_analysis_format:[11:29]
+==test_flask_page:[7:22]
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+
+from run import app  # pylint: disable=import-error,wrong-import-position
+
+@pytest.fixture
+def example_client():
+    """Return a Flask test client."""
+    return app.test_client()
+
+
+@pytest.mark.analysis
+def test_answer_labels_present(example_client): # pylint: disable=redefined-outer-name
+    """Check that 'Answer:' labels appear in the rendered analysis page"""
+    response = example_client.get("/")
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+
+    # Look for "Answer:" at least once (duplicate-code)
+
+
+Report
+======
+265 statements analysed.
+
+Statistics by type
+------------------
+
++---------+-------+-----------+-----------+------------+---------+
+|type     |number |old number |difference |%documented |%badname |
++=========+=======+===========+===========+============+=========+
+|module   |10     |1          |+9.00      |100.00      |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|class    |6      |2          |+4.00      |100.00      |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|method   |20     |4          |+16.00     |100.00      |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|function |26     |3          |+23.00     |100.00      |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+
+
+
+External dependencies
+---------------------
+::
+
+    bs4 (test_analysis_format)
+    psycopg (test_db_insert)
+    pytest (test_analysis_format,test_buttons,test_clean,test_db_insert,test_flask_page,test_integration_end_to_end,test_load_data,test_query_data,test_scrape)
+
+
+
+679 lines have been analyzed
+
+Raw metrics
+-----------
+
++----------+-------+------+---------+-----------+
+|type      |number |%     |previous |difference |
++==========+=======+======+=========+===========+
+|code      |376    |55.38 |NC       |NC         |
++----------+-------+------+---------+-----------+
+|docstring |127    |18.70 |NC       |NC         |
++----------+-------+------+---------+-----------+
+|comment   |35     |5.15  |NC       |NC         |
++----------+-------+------+---------+-----------+
+|empty     |141    |20.77 |NC       |NC         |
++----------+-------+------+---------+-----------+
+
+
+
+Duplication
+-----------
+
++-------------------------+------+---------+-----------+
+|                         |now   |previous |difference |
++=========================+======+=========+===========+
+|nb duplicated lines      |0     |0        |0          |
++-------------------------+------+---------+-----------+
+|percent duplicated lines |0.000 |0.000    |=          |
++-------------------------+------+---------+-----------+
+
+
+
+Messages by category
+--------------------
+
++-----------+-------+---------+-----------+
+|type       |number |previous |difference |
++===========+=======+=========+===========+
+|convention |0      |0        |0          |
++-----------+-------+---------+-----------+
+|refactor   |1      |0        |0          |
++-----------+-------+---------+-----------+
+|warning    |0      |0        |0          |
++-----------+-------+---------+-----------+
+|error      |0      |0        |0          |
++-----------+-------+---------+-----------+
+
+
+
+% errors / warnings by module
+-----------------------------
+
++------------+------+--------+---------+-----------+
+|module      |error |warning |refactor |convention |
++============+======+========+=========+===========+
+|test_scrape |0.00  |0.00    |100.00   |0.00       |
++------------+------+--------+---------+-----------+
+
+
+
+Messages
+--------
+
++---------------+------------+
+|message id     |occurrences |
++===============+============+
+|duplicate-code |1           |
++---------------+------------+
+
+
+
+
+-------------------------------------------------------------------
+Your code has been rated at 9.96/10 (previous run: 10.00/10, -0.04)
