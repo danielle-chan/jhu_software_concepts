@@ -5,29 +5,32 @@
 {% block content %}
   <h1>Analysis</h1>
 
+  <!-- Buttons Row -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; width: 100%;">
-    
-      <!-- Pull Data (left) -->
-  <div style="flex: 1;">
-    <form id="scrape-form" action="{{ url_for('api_scrape') }}" method="post" style="display:inline;">
-      <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
-        Pull Data
-      </button>
-    </form>
-    <p><i>Click to scrape the latest GradCafe data, clean it, standardize it, and add it to the database.</i></p>
+
+    <!-- Pull Data (left) -->
+    <div style="flex: 1;">
+      <form id="scrape-form" action="{{ url_for('api_scrape') }}" method="post" style="display:inline;">
+        <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
+          Pull Data
+        </button>
+      </form>
+      <p><i>Click to scrape the latest GradCafe data, clean it, standardize it, and add it to the database.</i></p>
+    </div>
+
+    <!-- Update Analysis (right) -->
+    <div style="flex: 1; text-align: right;">
+      <form id="recompute-form" action="{{ url_for('api_recompute') }}" method="post" style="display:inline;">
+        <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
+          Update Analysis
+        </button>
+      </form>
+      <p><i>Click to refresh the analysis with the most up-to-date data.</i></p>
+    </div>
+
   </div>
 
-  <!-- Update Analysis (right) -->
-  <div style="flex: 1; text-align: right;">
-    <form id="recompute-form" action="{{ url_for('api_recompute') }}" method="post" style="display:inline;">
-      <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
-        Update Analysis
-      </button>
-    </form>
-    <p><i>Click to refresh the analysis with the most up-to-date data.</i></p>
-  </div>
-
-    <!-- Queued banner will appear here -->
+  <!-- Queued banner -->
   <div id="queued-banner" style="margin-top:10px; display:none; color:#2e7d32; font-weight:600;"></div>
 
   <script>
@@ -42,6 +45,7 @@
           if (res.status === 202) {
             banner.textContent = successText;
             banner.style.display = "block";
+            banner.style.color = "#2e7d32";
           } else {
             const body = await res.json().catch(() => ({}));
             banner.textContent = body.error ? `Error: ${body.error}` : "Failed to queue request";
@@ -59,68 +63,74 @@
     wireAsyncForm("recompute-form", "Request queued: recompute_analytics");
   </script>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul style="color: red;">
-      {% for msg in messages %}
-        <li>{{ msg }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul style="color: red;">
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 
-  <div class="analysis">
-    <h3>How many entries do you have in your database who have applied for Fall 2025?</h3>
-    <i><p>Answer: {{ count }}</p></i>
+  <!-- Analysis Section -->
+  <div class="analysis-list" style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+
+    <div class="analysis">
+      <h3>How many entries do you have in your database who have applied for Fall 2025?</h3>
+      <i><p>Answer: {{ count }}</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>What percentage of entries are from international students?</h3>
+      <i><p>Answer: {{ (percent_international or 0)|round(2) }}%</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>What is the average GPA, GRE, GRE V, GRE AW of applicants who provide these metrics?</h3>
+      <i>
+        <p>GPA: {{ (avg_gpa or 0)|round(2) }}</p>
+        <p>GRE Total: {{ (avg_gre or 0)|round(2) }}</p>
+        <p>GRE Verbal: {{ (avg_gre_v or 0)|round(2) }}</p>
+        <p>GRE AW: {{ (avg_gre_aw or 0)|round(2) }}</p>
+      </i>
+    </div>
+
+    <div class="analysis">
+      <h3>What is the average GPA of American students in Fall 2025?</h3>
+      <i><p>Answer: {{ (avg_gpa_american or 0)|round(2) }}</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>What percent of entries for Fall 2025 are Acceptances?</h3>
+      <i><p>Answer: {{ (percent_acceptances or 0)|round(2) }}%</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>What is the average GPA of accepted applicants in Fall 2025?</h3>
+      <i><p>Answer: {{ (avg_gpa_accepted or 0)|round(2) }}</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>How many entries are from applicants who applied to JHU for a Master’s in Computer Science?</h3>
+      <i><p>Answer: {{ jhu_apps }}</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>How many entries from 2025 are acceptances from applicants who applied to Georgetown University for a PhD in Computer Science?</h3>
+      <i><p>Answer: {{ gtown_apps }}</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>How many students applied for Fall 2025 to a Data Science program?</h3>
+      <i><p>Answer: {{ ds_apps }}</p></i>
+    </div>
+
+    <div class="analysis">
+      <h3>How many students submitted a GRE score?</h3>
+      <i><p>Answer: {{ count_gre }}</p></i>
+    </div>
+
   </div>
 
-  <div class="analysis">
-    <h3>What percentage of entries are from international students?</h3>
-    <i><p>Answer: {{ (percent_international or 0)|round(2) }}%</p></i>
-  </div>
-
-  <div class="analysis">
-    <h3>What is the average GPA, GRE, GRE V, GRE AW of applicants who provide these metrics?</h3>
-    <i>
-      <p>GPA: {{ (avg_gpa or 0)|round(2) }}</p>
-      <p>GRE Total: {{ (avg_gre or 0)|round(2) }}</p>
-      <p>GRE Verbal: {{ (avg_gre_v or 0)|round(2) }}</p>
-      <p>GRE AW: {{ (avg_gre_aw or 0)|round(2) }}</p>
-    </i>
-  </div>
-
-  <div class="analysis">
-    <h3>What is the average GPA of American students in Fall 2025?</h3>
-    <i><p>Answer: {{ (avg_gpa_american or 0)|round(2) }}</p></i>
-  </div>
-
-  <div class="analysis">
-    <h3>What percent of entries for Fall 2025 are Acceptances?</h3>
-    <i><p>Answer: {{ (percent_acceptances or 0)|round(2) }}%</p></i>
-  </div>
-
-  <div class="analysis">
-    <h3>What is the average GPA of accepted applicants in Fall 2025?</h3>
-    <i><p>Answer: {{ (avg_gpa_accepted or 0)|round(2) }}</p></i>
-  </div>
-
-  <div class="analysis">
-    <h3>How many entries are from applicants who applied to JHU for a Master’s in Computer Science?</h3>
-    <i><p>Answer: {{ jhu_apps }}</p></i>
-  </div>
-
-  <div class="analysis">
-    <h3>How many entries from 2025 are acceptances from applicants who applied to Georgetown University for a PhD in Computer Science?</h3>
-    <i><p>Answer: {{ gtown_apps }}</p></i>
-  </div>
-
-  <div class="analysis">
-    <h3>How many students applied for Fall 2025 to a Data Science program?</h3>
-    <i><p>Answer: {{ ds_apps }}</p></i>
-  </div>
-
-  <div class="analysis">
-    <h3>How many students submitted a GRE score?</h3>
-    <i><p>Answer: {{ count_gre }}</p></i>
-  </div>
 {% endblock %}
