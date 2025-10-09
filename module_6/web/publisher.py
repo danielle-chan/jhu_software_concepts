@@ -1,4 +1,12 @@
-import os, json
+"""RabbitMQ publisher utilities for the web app.
+
+Exposes:
+- _open_channel() -> (conn, ch)
+- publish_task(kind: str, payload: dict | None = None, headers: dict | None = None) -> None
+"""
+
+import os
+import json
 from datetime import datetime
 import pika
 

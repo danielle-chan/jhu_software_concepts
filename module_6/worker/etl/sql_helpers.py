@@ -2,9 +2,8 @@
 
 from psycopg import sql
 
-# -----------------------------------------------------
+
 # Static SQL constants
-# -----------------------------------------------------
 
 SQL_COUNT_JHU_CS_MASTERS = """
     SELECT COUNT(*)
