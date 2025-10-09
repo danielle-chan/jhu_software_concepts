@@ -7,27 +7,57 @@
 
   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; width: 100%;">
     
-    <!-- Pull Data (left) -->
-    <div style="flex: 1;">
-      <form action="{{ url_for('pull_data') }}" method="get" style="display:inline;">
-        <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
-          Pull Data
-        </button>
-      </form>
-      <p><i>Click to scrape the latest GradCafe data, clean it, standardize it, and add it to the database.</i></p>
-    </div>
-
-    <!-- Update Analysis (right) -->
-    <div style="flex: 1; text-align: right;">
-      <form action="{{ url_for('update_analysis') }}" method="get" style="display:inline;">
-        <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
-          Update Analysis
-        </button>
-      </form>
-      <p><i>Click to refresh the analysis with the most up-to-date data.</i></p>
-    </div>
-
+      <!-- Pull Data (left) -->
+  <div style="flex: 1;">
+    <form id="scrape-form" action="{{ url_for('api_scrape') }}" method="post" style="display:inline;">
+      <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
+        Pull Data
+      </button>
+    </form>
+    <p><i>Click to scrape the latest GradCafe data, clean it, standardize it, and add it to the database.</i></p>
   </div>
+
+  <!-- Update Analysis (right) -->
+  <div style="flex: 1; text-align: right;">
+    <form id="recompute-form" action="{{ url_for('api_recompute') }}" method="post" style="display:inline;">
+      <button type="submit" style="padding:10px 20px; font-size:16px; background-color:#607d8b; color:white; border:none; border-radius:5px;">
+        Update Analysis
+      </button>
+    </form>
+    <p><i>Click to refresh the analysis with the most up-to-date data.</i></p>
+  </div>
+
+    <!-- Queued banner will appear here -->
+  <div id="queued-banner" style="margin-top:10px; display:none; color:#2e7d32; font-weight:600;"></div>
+
+  <script>
+    function wireAsyncForm(formId, successText) {
+      const form = document.getElementById(formId);
+      const banner = document.getElementById("queued-banner");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const url = form.getAttribute("action");
+        try {
+          const res = await fetch(url, { method: "POST" });
+          if (res.status === 202) {
+            banner.textContent = successText;
+            banner.style.display = "block";
+          } else {
+            const body = await res.json().catch(() => ({}));
+            banner.textContent = body.error ? `Error: ${body.error}` : "Failed to queue request";
+            banner.style.display = "block";
+            banner.style.color = "#b00020";
+          }
+        } catch (err) {
+          banner.textContent = "Network error while queueing request";
+          banner.style.display = "block";
+          banner.style.color = "#b00020";
+        }
+      });
+    }
+    wireAsyncForm("scrape-form", "Request queued: scrape_new_data");
+    wireAsyncForm("recompute-form", "Request queued: recompute_analytics");
+  </script>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}

@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask, render_template, redirect, url_for, flash, make_response
+from flask import Flask, render_template, redirect, url_for, flash, make_response, jsonify, current_app
 import psycopg
 from psycopg import sql
 from publisher import publish_task 
@@ -208,33 +208,25 @@ def index():
         count_gre=count_gre,
     )
 
-# Publish a "scrape_new_data" task and return HTTP 202
-@app.route("/pull_data", methods=["GET", "POST"])
-def pull_data():
+@app.post("/api/scrape")
+def api_scrape():
     try:
-        publish_task("scrape_new_data", {"source": "gradcafe"})
-        flash("Request queued: scrape_new_data")
-        resp = make_response(redirect(url_for("index")))
-        resp.status_code = 202
-        return resp
-    except Exception as e:  # pylint: disable=broad-except
-        app.logger.exception("Failed to publish pull_data task: %s", e)
-        flash(f"Failed to queue task: {e}")
-        return make_response(redirect(url_for("index")), 503)
+        publish_task("scrape_new_data", payload={})
+        return jsonify({"status": "queued", "task": "scrape_new_data"}), 202
+    except Exception:
+        current_app.logger.exception("Failed to publish scrape_new_data")
+        return jsonify({"error": "publish_failed"}), 503
 
-# Publish a "recompute_analytics" task and return HTTP 202
-@app.route("/update_analysis", methods=["GET", "POST"])
-def update_analysis():
+
+@app.post("/api/recompute")
+def api_recompute():
     try:
-        publish_task("recompute_analytics")
-        flash("Request queued: recompute_analytics")
-        resp = make_response(redirect(url_for("index")))
-        resp.status_code = 202
-        return resp
-    except Exception as e:  # pylint: disable=broad-except
-        app.logger.exception("Failed to publish update_analysis task: %s", e)
-        flash(f"Failed to queue task: {e}")
-        return make_response(redirect(url_for("index")), 503)
+        publish_task("recompute_analytics", payload={})
+        return jsonify({"status": "queued", "task": "recompute_analytics"}), 202
+    except Exception:
+        current_app.logger.exception("Failed to publish recompute_analytics")
+        return jsonify({"error": "publish_failed"}), 503
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=False)

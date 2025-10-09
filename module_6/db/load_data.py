@@ -16,6 +16,14 @@ def _iter_records(file_path):
             if line:
                 yield json.loads(line)
 
+def ensure_watermark_table(cur):
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS ingestion_watermarks (
+            source TEXT PRIMARY KEY,
+            last_seen TEXT,
+            updated_at TIMESTAMPTZ DEFAULT now()
+        );
+    """)
 
 def to_float(v):
     """Return a float or None from messy numeric strings like '3.9', '320', '160/170', '4.5 (AW)', 'N/A'."""
@@ -48,6 +56,8 @@ def load_data_from_jsonl(file_path=DEFAULT_FILE):
         port=DB_PORT,
     )
     cur = conn.cursor() # pylint: disable=no-member
+
+    ensure_watermark_table(cur)
 
     # --- Step 1: Clear old data
     truncate_stmt = sql.SQL("TRUNCATE TABLE {tbl}").format(
