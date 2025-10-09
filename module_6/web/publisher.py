@@ -26,9 +26,6 @@ def _open_channel():
     ch.queue_declare(queue=QUEUE, durable=True)
     ch.queue_bind(exchange=EXCHANGE, queue=QUEUE, routing_key=ROUTING_KEY)
 
-    # Optional, recommended
-    # ch.confirm_delivery()
-
     return conn, ch
 
 
