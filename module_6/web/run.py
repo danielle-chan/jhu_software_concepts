@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask, render_template, redirect, url_for, flash, make_response, jsonify, current_app
+from flask import Flask, render_template, jsonify, current_app
 import psycopg
 from psycopg import sql
 from publisher import publish_task 
